@@ -110,12 +110,18 @@
             <label class="text-xs text-slate-400 cursor-pointer outfit">Remember this device for 30 days</label>
           </div>
 
+          <div v-if="loginError" class="bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-center">
+            <p class="text-red-400 text-xs font-bold uppercase tracking-widest ubuntu">{{ loginError }}</p>
+          </div>
+
           <button
             type="submit"
-            class="w-full flex items-center justify-center gap-2 bg-primary hover:bg-[#5355e1] text-white py-4 rounded-2xl font-bold text-[11px] uppercase tracking-[0.2em] transition-all shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:shadow-[0_0_30px_rgba(99,102,241,0.3)] hover:-translate-y-0.5 mt-4 group ubuntu"
+            :disabled="authStore.loading"
+            class="w-full flex items-center justify-center gap-2 bg-primary hover:bg-[#5355e1] text-white py-4 rounded-2xl font-bold text-[11px] uppercase tracking-[0.2em] transition-all shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:shadow-[0_0_30px_rgba(99,102,241,0.3)] hover:-translate-y-0.5 mt-4 group ubuntu disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-[0_0_20px_rgba(99,102,241,0.2)]"
           >
-            Authenticate Session
-            <ArrowRight class="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <span v-if="authStore.loading">Authenticating...</span>
+            <span v-else>Authenticate Session</span>
+            <ArrowRight v-if="!authStore.loading" class="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>
         </form>
 
@@ -163,11 +169,23 @@ const email = ref('')
 const password = ref('')
 const showPassword = ref(false)
 const rememberMe = ref(false)
+const loginError = ref('')
 
-function handleLogin() {
-  if (email.value && password.value) {
-    authStore.login(email.value)
+async function handleLogin() {
+  if (!email.value || !password.value) {
+    loginError.value = 'Please enter both email and password'
+    return
+  }
+
+  const result = await authStore.loginWithCredentials({
+    email: email.value,
+    password: password.value
+  })
+
+  if (result.success) {
     router.push('/dashboard')
+  } else {
+    loginError.value = result.error || 'Login failed'
   }
 }
 </script>

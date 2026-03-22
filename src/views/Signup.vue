@@ -14,6 +14,10 @@
 
       <div class="glass-card rounded-2xl p-8">
         <form @submit.prevent="handleSignup" class="space-y-5">
+          <div v-if="signupError" class="bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-center">
+            <p class="text-red-400 text-xs font-bold uppercase tracking-widest ubuntu">{{ signupError }}</p>
+          </div>
+
           <div class="space-y-2">
             <label class="text-xs font-bold uppercase tracking-widest text-slate-400 ubuntu">Full Name</label>
             <input
@@ -47,11 +51,23 @@
             />
           </div>
 
+          <div class="space-y-2">
+            <label class="text-xs font-bold uppercase tracking-widest text-slate-400 ubuntu">Confirm Password</label>
+            <input
+              v-model="passwordConfirmation"
+              type="password"
+              placeholder="••••••••"
+              class="w-full bg-surface-container-high border border-white/5 rounded-xl px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all outfit"
+              required
+            />
+          </div>
+
           <button
             type="submit"
-            class="w-full bg-primary text-white py-3 rounded-xl text-xs font-bold uppercase tracking-widest shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:shadow-[0_0_30px_rgba(99,102,241,0.3)] transition-all hover:bg-[#5355e1] active:scale-95 ubuntu"
+            :disabled="authStore.loading"
+            class="w-full bg-primary text-white py-3 rounded-xl text-xs font-bold uppercase tracking-widest shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:shadow-[0_0_30px_rgba(99,102,241,0.3)] transition-all hover:bg-[#5355e1] active:scale-95 ubuntu disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Create Account
+            {{ authStore.loading ? 'Creating Account...' : 'Create Account' }}
           </button>
         </form>
 
@@ -79,11 +95,31 @@ const authStore = useAuthStore()
 const name = ref('')
 const email = ref('')
 const password = ref('')
+const passwordConfirmation = ref('')
+const signupError = ref('')
 
-function handleSignup() {
-  if (email.value && password.value) {
-    authStore.login(email.value)
-    router.push('/dashboard')
+async function handleSignup() {
+  if (!email.value || !password.value || !name.value) {
+    signupError.value = 'Please fill in all required fields'
+    return
+  }
+
+  if (password.value !== passwordConfirmation.value) {
+    signupError.value = 'Passwords do not match'
+    return
+  }
+
+  const result = await authStore.register({
+    name: name.value,
+    email: email.value,
+    password: password.value,
+    password_confirmation: passwordConfirmation.value
+  })
+
+  if (result.success) {
+    router.push('/login')
+  } else {
+    signupError.value = result.error || 'Registration failed'
   }
 }
 </script>
