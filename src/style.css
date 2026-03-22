@@ -1,0 +1,55 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-surface: #0b0f19;
+  --color-surface-container: #111827;
+  --color-surface-container-low: #0e1420;
+  --color-surface-container-high: #1f2937;
+  --color-surface-container-highest: #2d3748;
+  --color-on-surface: #dfe2f1;
+  --color-on-surface-variant: #c7c4d7;
+  --color-primary: #6366f1;
+  --color-primary-container: #6366f1;
+  --color-on-primary-fixed: #07006c;
+  --color-outline-variant: #464554;
+  --color-tertiary: #ffb783;
+  
+  --font-family-sans: 'Outfit', sans-serif;
+  --font-family-headline: 'Syne', sans-serif;
+  --font-family-ubuntu: 'Ubuntu', sans-serif;
+  --font-family-space: 'Space Grotesk', sans-serif;
+}
+
+body {
+  background-color: var(--color-surface);
+  color: var(--color-on-surface);
+  font-family: var(--font-family-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-headline {
+  font-family: var(--font-family-headline) !important;
+}
+
+.ubuntu {
+  font-family: var(--font-family-ubuntu) !important;
+}
+
+.space-font {
+  font-family: var(--font-family-space) !important;
+}
+
+.glass-card {
+  background-color: rgba(17, 24, 39, 0.8);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
