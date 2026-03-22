@@ -21,8 +21,20 @@ export const useProjectsStore = defineStore('projects', () => {
     error.value = null
     try {
       const response = await projectsAPI.list(params)
-      projects.value = response.data
-      return { success: true, data: response.data }
+      const payload = response.data
+
+      if (Array.isArray(payload)) {
+        projects.value = payload
+      } else if (Array.isArray(payload.data)) {
+        projects.value = payload.data
+      } else if (Array.isArray(payload.projects)) {
+        projects.value = payload.projects
+      } else {
+        // fallback for singular object or unexpected response
+        projects.value = []
+      }
+
+      return { success: true, data: projects.value }
     } catch (err) {
       error.value = err.response?.data?.message || 'Failed to fetch projects'
       return { success: false, error: error.value }

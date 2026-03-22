@@ -4,6 +4,9 @@ import { authAPI } from '@/services/api'
 
 export const useAuthStore = defineStore('auth', () => {
   const isLoggedIn = ref(false)
+  const userEmail = ref(null)
+  const userName = ref('Alex Rivera')
+  const userAvatar = ref('https://i.pravatar.cc/150?u=alex')
   const user = ref(null)
   const authToken = ref(null)
   const loading = ref(false)
@@ -58,6 +61,8 @@ export const useAuthStore = defineStore('auth', () => {
       const { token, user: userData } = response.data
       authToken.value = token
       user.value = userData
+      userName.value = userData.name || userData.email || credentials.email || 'User'
+      userAvatar.value = userData.avatar || `https://i.pravatar.cc/150?u=${userData.email || credentials.email}`
       isLoggedIn.value = true
       localStorage.setItem('authToken', token)
       localStorage.setItem('user', JSON.stringify(userData))
@@ -130,7 +135,10 @@ export const useAuthStore = defineStore('auth', () => {
     }
     if (storedUser) {
       try {
-        user.value = JSON.parse(storedUser)
+        const userData = JSON.parse(storedUser)
+        user.value = userData
+        userName.value = userData.name || userData.email || 'User'
+        userAvatar.value = userData.avatar || `https://i.pravatar.cc/150?u=${userData.email || 'user'}`
       } catch (e) {
         user.value = null
       }

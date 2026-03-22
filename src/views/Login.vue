@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex bg-surface">
+  <div class="min-h-screen flex bg-surface overflow-y-hidden">
     <!-- Left Split: Visual Showcase -->
     <div class="hidden lg:flex lg:w-1/2 relative bg-surface-container flex-col justify-between p-12 border-r border-white/5 overflow-hidden">
       <div class="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-primary/10 rounded-full blur-[120px] pointer-events-none"></div>
@@ -60,7 +60,7 @@
           <p class="text-slate-400 text-sm outfit">Enter your credentials to access your workspace.</p>
         </div>
 
-        <form @submit.prevent="handleLogin" class="space-y-6">
+        <form @submit.prevent="handleLogin" class="space-y-4">
           <div class="space-y-2">
             <label class="text-[10px] uppercase tracking-widest text-primary font-bold ml-1 ubuntu">Email Address</label>
             <div class="relative group">
@@ -125,27 +125,13 @@
           </button>
         </form>
 
-        <div class="relative py-4">
+        <div class="relative py-1">
           <div class="absolute inset-0 flex items-center">
             <div class="w-full border-t border-white/5"></div>
           </div>
-          <div class="relative flex justify-center text-xs">
-            <span class="bg-surface px-4 text-slate-500 uppercase tracking-widest font-bold ubuntu text-[9px]">Or continue with</span>
-          </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
-          <button type="button" class="flex items-center justify-center gap-3 p-4 rounded-xl bg-surface-container border border-white/5 hover:border-primary/30 hover:bg-surface-container-high transition-all group shadow-inner">
-            <div class="w-4 h-4 bg-white rounded-[2px] group-hover:scale-110 transition-transform"></div>
-            <span class="text-[10px] font-bold text-white uppercase tracking-widest ubuntu">Google</span>
-          </button>
-          <button type="button" class="flex items-center justify-center gap-3 p-4 rounded-xl bg-surface-container border border-white/5 hover:border-primary/30 hover:bg-surface-container-high transition-all group shadow-inner">
-            <Github class="w-5 h-5 text-white group-hover:scale-110 transition-transform" />
-            <span class="text-[10px] font-bold text-white uppercase tracking-widest ubuntu">GitHub</span>
-          </button>
-        </div>
-
-        <p class="text-center text-xs text-slate-500 outfit pt-6">
+        <p class="text-center text-xs text-slate-500 outfit">
           Don't have an agency account yet?
           <RouterLink to="/signup" class="text-white hover:text-primary font-bold transition-colors ml-1">Request Access</RouterLink>
         </p>

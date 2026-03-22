@@ -18,8 +18,19 @@ export const useTasksStore = defineStore('tasks', () => {
     error.value = null
     try {
       const response = await tasksAPI.list(params)
-      tasks.value = response.data
-      return { success: true, data: response.data }
+      const payload = response.data
+
+      if (Array.isArray(payload)) {
+        tasks.value = payload
+      } else if (Array.isArray(payload.data)) {
+        tasks.value = payload.data
+      } else if (Array.isArray(payload.tasks)) {
+        tasks.value = payload.tasks
+      } else {
+        tasks.value = []
+      }
+
+      return { success: true, data: tasks.value }
     } catch (err) {
       error.value = err.response?.data?.message || 'Failed to fetch tasks'
       return { success: false, error: error.value }

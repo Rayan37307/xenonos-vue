@@ -33,15 +33,15 @@
           </section>
 
           <!-- Stats Cards Row -->
-          <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div class="bg-surface/50 border border-white/5 p-8 rounded-2xl flex flex-col justify-between group relative overflow-hidden transition-all hover:-translate-y-1 hover:border-white/10 shadow-xl">
               <div class="space-y-1 relative z-10">
                 <span class="text-[10px] uppercase tracking-widest text-slate-500 font-bold ubuntu">Total Projects</span>
-                <div class="text-4xl font-bold text-white tracking-tight space-font">24</div>
+                <div class="text-4xl font-bold text-white tracking-tight space-font">{{ dashboardData.totalProjects }}</div>
               </div>
               <div class="mt-6 flex items-center gap-2 text-primary text-[10px] font-bold uppercase tracking-widest relative z-10 ubuntu">
                 <Folder class="w-3.5 h-3.5" />
-                <span>+3 this month</span>
+                <span>+{{ dashboardData.projectsThisMonth }} this month</span>
               </div>
               <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
             </div>
@@ -49,11 +49,11 @@
             <div class="bg-surface/50 border border-white/5 p-8 rounded-2xl flex flex-col justify-between group relative overflow-hidden transition-all hover:-translate-y-1 hover:border-white/10 shadow-xl">
               <div class="space-y-1 relative z-10">
                 <span class="text-[10px] uppercase tracking-widest text-slate-500 font-bold ubuntu">Completed</span>
-                <div class="text-4xl font-bold text-white tracking-tight space-font">68%</div>
+                <div class="text-4xl font-bold text-white tracking-tight space-font">{{ dashboardData.completionPercentage }}%</div>
               </div>
               <div class="mt-6 space-y-2 relative z-10">
                 <div class="w-full h-1.5 bg-surface rounded-full overflow-hidden p-0.5 border border-white/5">
-                  <div class="h-full bg-emerald-400 rounded-full shadow-[0_0_10px_rgba(52,211,153,0.4)]" style="width: 68%"></div>
+                  <div class="h-full bg-emerald-400 rounded-full shadow-[0_0_10px_rgba(52,211,153,0.4)]" :style="{ width: dashboardData.completionPercentage + '%' }"></div>
                 </div>
               </div>
               <div class="absolute inset-0 bg-gradient-to-br from-emerald-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -62,25 +62,13 @@
             <div class="bg-surface/50 border border-white/5 p-8 rounded-2xl flex flex-col justify-between group relative overflow-hidden transition-all hover:-translate-y-1 hover:border-white/10 shadow-xl">
               <div class="space-y-1 relative z-10">
                 <span class="text-[10px] uppercase tracking-widest text-slate-500 font-bold ubuntu">Ongoing Tasks</span>
-                <div class="text-4xl font-bold text-white tracking-tight space-font">12</div>
+                <div class="text-4xl font-bold text-white tracking-tight space-font">{{ dashboardData.ongoingTasks }}</div>
               </div>
               <div class="mt-6 flex items-center gap-2 text-amber-400 text-[10px] font-bold uppercase tracking-widest relative z-10 ubuntu">
                 <Zap class="w-3.5 h-3.5" />
-                <span>4 due today</span>
+                <span>{{ dashboardData.tasksDueToday }} due today</span>
               </div>
               <div class="absolute inset-0 bg-gradient-to-br from-amber-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            </div>
-
-            <div class="bg-surface/50 border border-white/5 p-8 rounded-2xl flex flex-col justify-between group relative overflow-hidden transition-all hover:-translate-y-1 hover:border-white/10 shadow-xl">
-              <div class="space-y-1 relative z-10">
-                <span class="text-[10px] uppercase tracking-widest text-slate-500 font-bold ubuntu">Team Bandwidth</span>
-                <div class="text-4xl font-bold text-white tracking-tight space-font">82%</div>
-              </div>
-              <div class="mt-6 flex items-center gap-2 text-primary text-[10px] font-bold uppercase tracking-widest relative z-10 ubuntu">
-                <TrendingUp class="w-3.5 h-3.5" />
-                <span>Near capacity</span>
-              </div>
-              <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
             </div>
           </section>
 
@@ -96,59 +84,37 @@
                   </button>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div @click="router.push('/project-details')" class="bg-surface/60 border border-white/5 rounded-2xl p-8 hover:border-primary/30 transition-all group cursor-pointer shadow-xl relative overflow-hidden">
-                    <div class="flex justify-between items-start mb-8">
-                      <div class="w-12 h-12 rounded-2xl bg-surface-container-high flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
-                        <Zap class="w-6 h-6" />
+                  <template v-if="activeProjects.length > 0">
+                    <div v-for="project in activeProjects" :key="project.id" @click="router.push(`/project-details?id=${project.id}`)"
+                      class="bg-surface/60 border border-white/5 rounded-2xl p-8 hover:border-primary/30 transition-all group cursor-pointer shadow-xl relative overflow-hidden">
+                      <div class="flex justify-between items-start mb-8">
+                        <div class="w-12 h-12 rounded-2xl bg-surface-container-high flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
+                          <Zap class="w-6 h-6" />
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border" :class="project.status === 'active' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'">{{ project.status || 'active' }}</span>
                       </div>
-                      <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border bg-emerald-500/10 text-emerald-400 border-emerald-500/20 ubuntu">active</span>
-                    </div>
-                    <h4 class="text-xl font-bold text-white mb-1 group-hover:text-primary transition-colors tracking-tight font-headline">Neo-Finance App</h4>
-                    <p class="text-sm text-slate-500 mb-8 line-clamp-1 italic outfit">/ Complete overhaul of the native mobile app.</p>
-                    <div class="space-y-4">
-                      <div class="flex justify-between text-[10px] font-bold uppercase tracking-widest text-slate-500 ubuntu">
-                        <span>Progress</span>
-                        <span class="text-white space-font">65%</span>
+                      <h4 class="text-xl font-bold text-white mb-1 group-hover:text-primary transition-colors tracking-tight font-headline">{{ project.name || project.title || 'Unnamed project' }}</h4>
+                      <p class="text-sm text-slate-500 mb-8 line-clamp-1 italic outfit">{{ project.description || 'No description available.' }}</p>
+                      <div class="space-y-4">
+                        <div class="flex justify-between text-[10px] font-bold uppercase tracking-widest text-slate-500 ubuntu">
+                          <span>Progress</span>
+                          <span class="text-white space-font">{{ getProgress(project) }}%</span>
+                        </div>
+                        <div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden p-0.5 border border-white/5">
+                          <div class="h-full bg-primary rounded-full shadow-[0_0_10px_rgba(99,102,241,0.4)]" :style="{ width: getProgress(project) + '%' }"></div>
+                        </div>
                       </div>
-                      <div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden p-0.5 border border-white/5">
-                        <div class="h-full bg-primary rounded-full shadow-[0_0_10px_rgba(99,102,241,0.4)]" style="width: 65%"></div>
-                      </div>
-                    </div>
-                    <div class="mt-8 flex justify-between items-center pt-8 border-t border-white/5">
-                      <div class="flex -space-x-3">
-                        <img class="w-8 h-8 rounded-xl border-2 border-surface-container object-cover shadow-lg" src="https://i.pravatar.cc/150?u=1" alt="Team">
-                        <img class="w-8 h-8 rounded-xl border-2 border-surface-container object-cover shadow-lg" src="https://i.pravatar.cc/150?u=2" alt="Team">
-                        <div class="w-8 h-8 rounded-xl bg-surface-container-high border-2 border-surface-container flex items-center justify-center text-[10px] font-bold text-slate-400 shadow-lg space-font">+2</div>
-                      </div>
-                      <div class="text-[10px] text-slate-500 font-bold uppercase tracking-widest ubuntu">Due May 15</div>
-                    </div>
-                  </div>
-
-                  <div @click="router.push('/project-details')" class="bg-surface/60 border border-white/5 rounded-2xl p-8 hover:border-primary/30 transition-all group cursor-pointer shadow-xl relative overflow-hidden">
-                    <div class="flex justify-between items-start mb-8">
-                      <div class="w-12 h-12 rounded-2xl bg-surface-container-high flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
-                        <LayoutTemplate class="w-6 h-6" />
-                      </div>
-                      <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border bg-amber-500/10 text-amber-400 border-amber-500/20 ubuntu">pending</span>
-                    </div>
-                    <h4 class="text-xl font-bold text-white mb-1 group-hover:text-primary transition-colors tracking-tight font-headline">Enterprise Dashboard</h4>
-                    <p class="text-sm text-slate-500 mb-8 line-clamp-1 italic outfit">/ Scalable dashboard solution development.</p>
-                    <div class="space-y-4">
-                      <div class="flex justify-between text-[10px] font-bold uppercase tracking-widest text-slate-500 ubuntu">
-                        <span>Progress</span>
-                        <span class="text-white space-font">12%</span>
-                      </div>
-                      <div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden p-0.5 border border-white/5">
-                        <div class="h-full bg-primary rounded-full shadow-[0_0_10px_rgba(99,102,241,0.4)]" style="width: 12%"></div>
+                      <div class="mt-8 flex justify-between items-center pt-8 border-t border-white/5">
+                        <div class="flex -space-x-3">
+                          <img v-for="(member, idx) in (project.team_members || project.workers || [])" :key="idx" class="w-8 h-8 rounded-xl border-2 border-surface-container object-cover shadow-lg"
+                            :src="typeof member === 'string' ? member : (member.avatar || member.image || 'https://i.pravatar.cc/150?u='+idx)" alt="Team">
+                        </div>
+                        <div class="text-[10px] text-slate-500 font-bold uppercase tracking-widest ubuntu">{{ formatDueDate(project.deadline || project.due_date || project.dueDate) }}</div>
                       </div>
                     </div>
-                    <div class="mt-8 flex justify-between items-center pt-8 border-t border-white/5">
-                      <div class="flex -space-x-3">
-                        <img class="w-8 h-8 rounded-xl border-2 border-surface-container object-cover shadow-lg" src="https://i.pravatar.cc/150?u=3" alt="Team">
-                        <div class="w-8 h-8 rounded-xl bg-surface-container-high border-2 border-surface-container flex items-center justify-center text-[10px] font-bold text-slate-400 shadow-lg space-font">+1</div>
-                      </div>
-                      <div class="text-[10px] text-slate-500 font-bold uppercase tracking-widest ubuntu">Due Jun 01</div>
-                    </div>
+                  </template>
+                  <div v-else class="bg-surface-container-high/30 p-8 rounded-2xl text-slate-300 text-sm">
+                    No active projects to show.
                   </div>
                 </div>
               </section>
@@ -162,23 +128,26 @@
                   </button>
                 </div>
                 <div class="p-8 space-y-4">
-                  <div @click="router.push('/services')" class="deletable-item bg-surface-container-high/30 p-5 rounded-2xl flex items-center justify-between border border-white/5 hover:bg-surface-container-high/50 focus-within:border-primary/50 transition-all cursor-pointer group">
-                    <div class="flex items-center gap-5">
-                      <div class="w-12 h-12 rounded-2xl bg-surface-container-high flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
-                        <Folder class="w-6 h-6" />
+                  <template v-if="serviceOrders.length > 0">
+                    <div v-for="order in serviceOrders" :key="order.id" @click="router.push('/services')" class="deletable-item bg-surface-container-high/30 p-5 rounded-2xl flex items-center justify-between border border-white/5 hover:bg-surface-container-high/50 focus-within:border-primary/50 transition-all cursor-pointer group">
+                      <div class="flex items-center gap-5">
+                        <div class="w-12 h-12 rounded-2xl bg-surface-container-high flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
+                          <Folder class="w-6 h-6" />
+                        </div>
+                        <div>
+                          <p class="text-base font-bold text-white tracking-tight outfit">{{ order.title }}</p>
+                          <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5 ubuntu">{{ order.subtitle }} • {{ order.createdAt ? new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A' }}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p class="text-base font-bold text-white tracking-tight outfit">Illustration Pack</p>
-                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5 ubuntu">Order <span class="space-font">#SO-8821</span> • 2h ago</p>
+                      <div class="flex items-center gap-4">
+                        <span class="px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border text-blue-400 bg-blue-500/10 border-blue-500/20 ubuntu">{{ order.status || 'Processing' }}</span>
+                        <button @click.stop="deleteItem" class="p-2 text-slate-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 flex items-center justify-center">
+                          <Trash2 class="w-4 h-4" />
+                        </button>
                       </div>
                     </div>
-                    <div class="flex items-center gap-4">
-                      <span class="px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border text-blue-400 bg-blue-500/10 border-blue-500/20 ubuntu">Processing</span>
-                      <button @click.stop="deleteItem" class="p-2 text-slate-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 flex items-center justify-center">
-                        <Trash2 class="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
+                  </template>
+                  <div v-else class="text-slate-400 text-sm">No service orders available.</div>
                 </div>
               </section>
 
@@ -191,34 +160,23 @@
                   </button>
                 </div>
                 <div class="p-8 space-y-4">
-                  <div @click="router.push('/notification-details')" class="bg-surface-container-high/30 p-5 rounded-2xl flex items-center justify-between border border-white/5 hover:bg-surface-container-high/50 transition-all cursor-pointer group">
-                    <div class="flex items-center gap-5">
-                      <div class="w-12 h-12 rounded-2xl bg-surface-container-high flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
-                        <Bell class="w-6 h-6" />
+                  <template v-if="notifications.length > 0">
+                    <div v-for="notification in notifications" :key="notification.id" @click="router.push('/notification-details')" class="bg-surface-container-high/30 p-5 rounded-2xl flex items-center justify-between border border-white/5 hover:bg-surface-container-high/50 transition-all cursor-pointer group">
+                      <div class="flex items-center gap-5">
+                        <div class="w-12 h-12 rounded-2xl bg-surface-container-high flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
+                          <Bell class="w-6 h-6" />
+                        </div>
+                        <div>
+                          <p class="text-base font-bold text-white tracking-tight outfit">{{ notification.title }}</p>
+                          <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5 ubuntu">{{ notification.subtitle }} • {{ notification.time ? new Date(notification.time).toLocaleString() : 'Unknown' }}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p class="text-base font-bold text-white tracking-tight outfit">Custom Illustration Pack</p>
-                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5 ubuntu">Order <span class="space-font">#SO-8821</span> • 2h ago</p>
-                      </div>
+                      <button class="px-6 py-2 rounded-xl bg-surface-container-high text-on-surface text-[10px] font-bold uppercase tracking-widest hover:bg-[#2d3a4d] transition-all ubuntu">
+                        View Details
+                      </button>
                     </div>
-                    <button class="px-6 py-2 rounded-xl bg-surface-container-high text-on-surface text-[10px] font-bold uppercase tracking-widest hover:bg-[#2d3a4d] transition-all ubuntu">
-                      View Details
-                    </button>
-                  </div>
-                  <div @click="router.push('/notification-details')" class="bg-surface-container-high/30 p-5 rounded-2xl flex items-center justify-between border border-white/5 hover:bg-surface-container-high/50 transition-all cursor-pointer group">
-                    <div class="flex items-center gap-5">
-                      <div class="w-12 h-12 rounded-2xl bg-surface-container-high flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
-                        <Bell class="w-6 h-6" />
-                      </div>
-                      <div>
-                        <p class="text-base font-bold text-white tracking-tight outfit">API Integration Module</p>
-                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5 ubuntu">Order <span class="space-font">#SO-8794</span> • Yesterday</p>
-                      </div>
-                    </div>
-                    <button class="px-6 py-2 rounded-xl bg-surface-container-high text-on-surface text-[10px] font-bold uppercase tracking-widest hover:bg-[#2d3a4d] transition-all ubuntu">
-                      View Details
-                    </button>
-                  </div>
+                  </template>
+                  <div v-else class="text-slate-400 text-sm">No notifications yet.</div>
                 </div>
               </section>
             </div>
@@ -229,33 +187,18 @@
                 <h3 class="text-xl font-bold text-white tracking-tight mb-8 font-headline">Recent Activity</h3>
                 <div class="space-y-8 relative">
                   <div class="absolute left-[19px] top-2 bottom-2 w-px bg-white/5"></div>
-                  <div class="flex gap-6 relative z-10">
-                    <div class="w-10 h-10 rounded-xl bg-surface-container border border-white/5 flex items-center justify-center text-primary shadow-xl shrink-0">
-                      <CheckCircle class="w-4 h-4 text-emerald-400" />
+                  <template v-if="recentActivity.length > 0">
+                    <div v-for="activity in recentActivity" :key="activity.id" class="flex gap-6 relative z-10">
+                      <div class="w-10 h-10 rounded-xl bg-surface-container border border-white/5 flex items-center justify-center text-primary shadow-xl shrink-0">
+                        <CheckCircle class="w-4 h-4 text-emerald-400" />
+                      </div>
+                      <div class="space-y-1.5">
+                        <p class="text-sm text-on-surface leading-relaxed font-medium outfit">{{ activity.message }}</p>
+                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest ubuntu space-font">{{ activity.timestamp ? new Date(activity.timestamp).toLocaleString() : 'Just now' }}</p>
+                      </div>
                     </div>
-                    <div class="space-y-1.5">
-                      <p class="text-sm text-on-surface leading-relaxed font-medium outfit">Milestone reached on Neo-Finance Redesign.</p>
-                      <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest ubuntu space-font">2h ago</p>
-                    </div>
-                  </div>
-                  <div class="flex gap-6 relative z-10">
-                    <div class="w-10 h-10 rounded-xl bg-surface-container border border-white/5 flex items-center justify-center text-primary shadow-xl shrink-0">
-                      <MessageSquare class="w-4 h-4 text-blue-400" />
-                    </div>
-                    <div class="space-y-1.5">
-                      <p class="text-sm text-on-surface leading-relaxed font-medium outfit">Alex Rivera commented on wireframes.</p>
-                      <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest ubuntu space-font">4h ago</p>
-                    </div>
-                  </div>
-                  <div class="flex gap-6 relative z-10">
-                    <div class="w-10 h-10 rounded-xl bg-surface-container border border-white/5 flex items-center justify-center text-primary shadow-xl shrink-0">
-                      <FileText class="w-4 h-4 text-purple-400" />
-                    </div>
-                    <div class="space-y-1.5">
-                      <p class="text-sm text-on-surface leading-relaxed font-medium outfit">Project Scope V2 uploaded.</p>
-                      <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest ubuntu space-font">Yesterday</p>
-                    </div>
-                  </div>
+                  </template>
+                  <div v-else class="text-slate-400 text-sm">No recent activity.</div>
                 </div>
               </section>
 
@@ -326,8 +269,11 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useProjectsStore } from '@/stores/projects'
+import { useTasksStore } from '@/stores/tasks'
+import { authAPI } from '@/services/api'
 import {
   Folder, Zap, TrendingUp, ChevronRight, LayoutTemplate,
   MoreVertical, Bell, Trash2, CheckCircle, MessageSquare,
@@ -338,6 +284,120 @@ import AppTopNav from '@/components/AppTopNav.vue'
 
 const router = useRouter()
 const showMobileMenu = ref(false)
+const projectsStore = useProjectsStore()
+const tasksStore = useTasksStore()
+
+const dashboardSummary = ref({
+  totalProjects: 0,
+  projectsThisMonth: 0,
+  totalTasks: 0,
+  completedTasks: 0,
+  pendingTasks: 0
+})
+
+const dashboardData = computed(() => {
+  const totalProjects = projectsStore.projects.length > 0
+    ? projectsStore.projects.length
+    : dashboardSummary.value.totalProjects || 0
+
+  const projectsThisMonth = projectsStore.projects.length > 0
+    ? projectsStore.projects.filter((project) => {
+      const dateValue = project.created_at || project.createdAt || project.start_date || project.date
+      if (!dateValue) return false
+      const created = new Date(dateValue)
+      const now = new Date()
+      return created.getFullYear() === now.getFullYear() && created.getMonth() === now.getMonth()
+    }).length
+    : dashboardSummary.value.projectsThisMonth || 0
+
+  const totalTasks = tasksStore.tasks.length > 0 ? tasksStore.tasks.length : dashboardSummary.value.totalTasks || 0
+  const completedTasks = tasksStore.completedTasks.length > 0 ? tasksStore.completedTasks.length : dashboardSummary.value.completedTasks || 0
+  const ongoingTasksCount = tasksStore.tasks.length > 0
+    ? tasksStore.todoTasks.length + tasksStore.inProgressTasks.length + tasksStore.reviewTasks.length
+    : (dashboardSummary.value.totalTasks || 0) - (dashboardSummary.value.completedTasks || 0)
+
+  const tasksDueToday = tasksStore.tasks.length > 0
+    ? tasksStore.tasks.filter((task) => {
+      const dueValue = task.due_date || task.dueDate || task.deadline
+      if (!dueValue) return false
+      const due = new Date(dueValue)
+      const now = new Date()
+      return due.getFullYear() === now.getFullYear() && due.getMonth() === now.getMonth() && due.getDate() === now.getDate()
+    }).length
+    : 0
+
+  return {
+    totalProjects,
+    projectsThisMonth,
+    completionPercentage: totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0,
+    ongoingTasks: ongoingTasksCount,
+    tasksDueToday,
+    teamBandwidth: totalProjects > 0 ? Math.min(100, Math.round((ongoingTasksCount / (totalProjects * 5 || 1)) * 100)) : 0
+  }
+})
+
+const activeProjects = computed(() => {
+  const activeStatuses = ['active', 'in_progress', 'pending', 'planning', 'on_hold']
+  return projectsStore.projects
+    .filter((project) => activeStatuses.includes((project.status || '').toLowerCase()))
+    .slice(0, 2)
+})
+
+const serviceOrders = computed(() => tasksStore.tasks.slice(0, 3).map((task) => ({
+  id: task.id,
+  title: task.title || task.name || 'Untitled task',
+  subtitle: task.project_name ? `Project: ${task.project_name}` : `Task ID: ${task.id}`,
+  status: task.status || 'processing',
+  createdAt: task.created_at || task.createdAt
+})))
+
+const notifications = computed(() => tasksStore.tasks.slice(-2).reverse().map((task) => ({
+  id: task.id,
+  title: task.title || task.name || 'Update available',
+  subtitle: task.project_name ? `Project: ${task.project_name}` : `Task ID: ${task.id}`,
+  time: task.updated_at || task.updatedAt || task.created_at || task.createdAt
+})))
+
+const recentActivity = computed(() => tasksStore.tasks.slice(-3).reverse().map((task) => ({
+  id: task.id,
+  message: `Task "${task.title || task.name || 'Untitled'}" is ${task.status || 'updated'}`,
+  timestamp: task.updated_at || task.updatedAt || task.created_at || task.createdAt
+})))
+
+function formatDueDate(dateString) {
+  if (!dateString) return 'No deadline'
+  const date = new Date(dateString)
+  if (Number.isNaN(date.getTime())) return 'No deadline'
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+}
+
+function getProgress(project) {
+  if (!project) return 0
+  if (project.status === 'completed') return 100
+  return project.progress || 0
+}
+
+onMounted(async () => {
+  await Promise.all([projectsStore.fetchProjects(), tasksStore.fetchTasks()])
+
+  try {
+    const response = await authAPI.getDashboard()
+    const data = response.data
+
+    if (data?.stats) {
+      const payload = data.stats
+      dashboardSummary.value = {
+        totalProjects: payload.total_projects || payload.totalProjects || 0,
+        projectsThisMonth: payload.active_projects || payload.activeProjects || 0,
+        totalTasks: payload.total_tasks || payload.totalTasks || 0,
+        completedTasks: payload.completed_tasks || payload.completedTasks || 0,
+        pendingTasks: payload.pending_tasks || payload.pendingTasks || 0
+      }
+    }
+  } catch (error) {
+    console.error('Failed to fetch dashboard API data:', error)
+  }
+})
 
 function toggleMobileMenu() {
   showMobileMenu.value = !showMobileMenu.value

@@ -49,7 +49,8 @@ export const authAPI = {
   updateProfile: (data) => apiClient.put('/auth/profile', data),
   updateAvatar: (formData) => apiClient.post('/auth/avatar', formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
-  })
+  }),
+  getDashboard: () => apiClient.get('/dashboard')
 }
 
 // Projects API
