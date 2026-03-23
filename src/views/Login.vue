@@ -164,10 +164,14 @@ const password = ref('')
 const showPassword = ref(false)
 const rememberMe = ref(false)
 
-function handleLogin() {
+const handleLogin = async () => {
   if (email.value && password.value) {
-    authStore.login(email.value)
-    router.push('/dashboard')
+    try {
+      await authStore.login(email.value, password.value)
+      router.push('/dashboard')
+    } catch (err) {
+      // Error is handled in store
+    }
   }
 }
 </script>

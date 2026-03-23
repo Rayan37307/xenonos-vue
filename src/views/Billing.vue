@@ -20,7 +20,7 @@
         <div class="bg-surface/60 border border-white/5 p-8 rounded-3xl flex flex-col gap-1 group relative overflow-hidden transition-all hover:border-primary/30 shadow-xl">
           <span class="text-[10px] uppercase tracking-widest text-primary font-bold ubuntu mb-2">Total Invoiced</span>
           <div class="flex items-end gap-3 mt-1">
-            <span class="text-4xl font-bold text-white space-font tracking-tight">$12,450.00</span>
+            <span class="text-4xl font-bold text-white space-font tracking-tight">${{ totalInvoiced }}</span>
             <span class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-2 ubuntu">Lifetime</span>
           </div>
           <div class="mt-6 flex items-center gap-2 text-primary text-[10px] font-bold uppercase tracking-widest ubuntu bg-primary/10 self-start px-3 py-1.5 rounded-lg border border-primary/20">
@@ -31,7 +31,7 @@
         <div class="bg-surface/60 border border-white/5 p-8 rounded-3xl flex flex-col gap-1 group relative overflow-hidden transition-all hover:border-amber-500/30 shadow-xl">
           <span class="text-[10px] uppercase tracking-widest text-amber-400 font-bold ubuntu mb-2">Pending Amount</span>
           <div class="flex items-end gap-3 mt-1">
-            <span class="text-4xl font-bold text-white space-font tracking-tight">$1,240.00</span>
+            <span class="text-4xl font-bold text-white space-font tracking-tight">${{ pendingAmount }}</span>
             <span class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-2 ubuntu">Due in 3 days</span>
           </div>
           <div class="mt-6 flex items-center gap-2 text-amber-400 text-[10px] font-bold uppercase tracking-widest ubuntu bg-amber-500/10 self-start px-3 py-1.5 rounded-lg border border-amber-500/20">
@@ -42,7 +42,7 @@
         <div class="bg-surface/60 border border-white/5 p-8 rounded-3xl flex flex-col gap-1 group relative overflow-hidden transition-all hover:border-emerald-500/30 shadow-xl">
           <span class="text-[10px] uppercase tracking-widest text-emerald-400 font-bold ubuntu mb-2">Paid This Month</span>
           <div class="flex items-end gap-3 mt-1">
-            <span class="text-4xl font-bold text-white space-font tracking-tight">$4,950.00</span>
+            <span class="text-4xl font-bold text-white space-font tracking-tight">${{ paidThisMonth }}</span>
             <span class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-2 ubuntu">All current</span>
           </div>
           <div class="mt-6 flex items-center gap-2 text-emerald-400 text-[10px] font-bold uppercase tracking-widest ubuntu bg-emerald-500/10 self-start px-3 py-1.5 rounded-lg border border-emerald-500/20">
@@ -75,13 +75,26 @@
               </tr>
             </thead>
             <tbody class="divide-y divide-white/5">
-              <tr v-for="invoice in invoices" :key="invoice.number" class="group hover:bg-primary/[0.02] transition-colors cursor-pointer">
-                <td class="px-8 py-6">
-                  <span class="text-sm font-bold text-white group-hover:text-primary transition-colors font-headline">{{ invoice.number }}</span>
+              <tr v-if="loading" class="text-center">
+                <td colspan="6" class="px-8 py-12 text-slate-400">
+                  <div class="flex items-center justify-center gap-3">
+                    <div class="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    Loading invoices...
+                  </div>
                 </td>
-                <td class="px-8 py-6 text-[11px] font-bold tracking-widest uppercase text-slate-400 space-font">{{ invoice.issued }}</td>
-                <td class="px-8 py-6 text-[11px] font-bold tracking-widest uppercase text-slate-400 space-font">{{ invoice.due }}</td>
-                <td class="px-8 py-6 text-base font-bold text-white space-font tracking-tight">{{ invoice.amount }}</td>
+              </tr>
+              <tr v-else-if="error" class="text-center">
+                <td colspan="6" class="px-8 py-12 text-red-400">
+                  {{ error }}
+                </td>
+              </tr>
+              <tr v-else v-for="invoice in invoices" :key="invoice.invoice_id" class="group hover:bg-primary/[0.02] transition-colors cursor-pointer">
+                <td class="px-8 py-6">
+                  <span class="text-sm font-bold text-white group-hover:text-primary transition-colors font-headline">#{{ invoice.invoice_id }}</span>
+                </td>
+                <td class="px-8 py-6 text-[11px] font-bold tracking-widest uppercase text-slate-400 space-font">{{ formatDate(invoice.date_issued) }}</td>
+                <td class="px-8 py-6 text-[11px] font-bold tracking-widest uppercase text-slate-400 space-font">{{ formatDate(invoice.due_date) }}</td>
+                <td class="px-8 py-6 text-base font-bold text-white space-font tracking-tight">${{ invoice.amount }}</td>
                 <td class="px-8 py-6">
                   <span :class="['inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest border ubuntu', statusClass(invoice.status)]">
                     <span :class="['w-1.5 h-1.5 rounded-full', statusDotClass(invoice.status)]"></span>
@@ -89,8 +102,8 @@
                   </span>
                 </td>
                 <td class="px-8 py-6 text-right">
-                  <button class="w-8 h-8 rounded-lg bg-transparent hover:bg-white/10 text-slate-500 hover:text-white transition-all flex items-center justify-center ml-auto">
-                    <MoreHorizontal class="w-5 h-5" />
+                  <button @click="openInvoiceDetails(invoice)" class="inline-flex items-center gap-2 bg-[#5355E1] hover:bg-[#4547c9] text-white transition-all text-[10px] font-bold uppercase tracking-widest ubuntu px-4 py-2 rounded-xl cursor-pointer">
+                    <Eye class="w-4 h-4" /> View
                   </button>
                 </td>
               </tr>
@@ -98,35 +111,194 @@
           </table>
         </div>
       </section>
+
+      <!-- Invoice Details Modal -->
+      <div v-if="showDetailsModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="closeDetailsModal"></div>
+        <div class="relative bg-surface-container-high border border-white/10 rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+          <div class="sticky top-0 bg-surface-container-high/95 backdrop-blur border-b border-white/5 px-8 py-6 flex items-center justify-between rounded-t-3xl">
+            <div>
+              <h3 class="text-xl font-bold text-white tracking-tight font-headline">Invoice Details</h3>
+              <p class="text-xs text-slate-500 mt-1 outfit">Invoice #{{ selectedInvoice?.invoice_id }}</p>
+            </div>
+            <button @click="closeDetailsModal" class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 transition-all flex items-center justify-center">
+              <X class="w-5 h-5" />
+            </button>
+          </div>
+
+          <div v-if="detailsLoading" class="px-8 py-12 flex items-center justify-center">
+            <div class="flex items-center gap-3 text-slate-400">
+              <div class="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+              Loading details...
+            </div>
+          </div>
+          <div v-else-if="selectedInvoice" class="px-8 py-6 space-y-6">
+            <div class="grid grid-cols-2 gap-6">
+              <div class="space-y-1">
+                <span class="text-[10px] uppercase tracking-widest text-slate-500 font-bold ubuntu">Date Issued</span>
+                <p class="text-white font-bold space-font">{{ formatDate(selectedInvoice.date_issued) }}</p>
+              </div>
+              <div class="space-y-1">
+                <span class="text-[10px] uppercase tracking-widest text-slate-500 font-bold ubuntu">Due Date</span>
+                <p class="text-white font-bold space-font">{{ formatDate(selectedInvoice.due_date) }}</p>
+              </div>
+              <div class="space-y-1">
+                <span class="text-[10px] uppercase tracking-widest text-slate-500 font-bold ubuntu">Amount</span>
+                <p class="text-2xl font-bold text-white space-font">${{ selectedInvoice.amount }}</p>
+              </div>
+              <div class="space-y-1">
+                <span class="text-[10px] uppercase tracking-widest text-slate-500 font-bold ubuntu">Status</span>
+                <span :class="['inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest border ubuntu', statusClass(selectedInvoice.status)]">
+                  <span :class="['w-1.5 h-1.5 rounded-full', statusDotClass(selectedInvoice.status)]"></span>
+                  {{ selectedInvoice.status }}
+                </span>
+              </div>
+            </div>
+
+            <div class="border-t border-white/5 pt-6">
+              <h4 class="text-sm font-bold text-white font-headline mb-4">Invoice Information</h4>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-1">
+                  <span class="text-[10px] uppercase tracking-widest text-slate-500 font-bold ubuntu">Project ID</span>
+                  <p class="text-white text-sm space-font">#{{ selectedInvoice.project_id }}</p>
+                </div>
+                <div class="space-y-1">
+                  <span class="text-[10px] uppercase tracking-widest text-slate-500 font-bold ubuntu">Client ID</span>
+                  <p class="text-white text-sm space-font">#{{ selectedInvoice.client_id }}</p>
+                </div>
+                <div class="space-y-1">
+                  <span class="text-[10px] uppercase tracking-widest text-slate-500 font-bold ubuntu">Issued By</span>
+                  <p class="text-white text-sm space-font">#{{ selectedInvoice.issued_by }}</p>
+                </div>
+                <div class="space-y-1">
+                  <span class="text-[10px] uppercase tracking-widest text-slate-500 font-bold ubuntu">Created</span>
+                  <p class="text-white text-sm space-font">{{ formatDate(selectedInvoice.created_at) }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div v-if="selectedInvoice.file_path" class="border-t border-white/5 pt-6">
+              <h4 class="text-sm font-bold text-white font-headline mb-4">Invoice File</h4>
+              <div class="flex items-center gap-3 p-4 bg-surface/50 border border-white/5 rounded-xl">
+                <FileText class="w-5 h-5 text-primary" />
+                <div class="flex-1">
+                  <p class="text-sm font-bold text-white space-font">invoice.pdf</p>
+                  <p class="text-[10px] text-slate-500 ubuntu uppercase tracking-widest">PDF Document</p>
+                </div>
+                <button class="inline-flex items-center gap-2 bg-primary/10 hover:bg-primary/20 border border-primary/20 text-primary px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest ubuntu transition-all">
+                  <Download class="w-4 h-4" /> Download
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </AppLayout>
 </template>
 
 <script setup>
+import { ref, onMounted, computed } from 'vue'
 import AppLayout from '@/components/AppLayout.vue'
-import { Download, Plus, TrendingUp, Clock, CheckCircle, Filter, MoreHorizontal } from 'lucide-vue-next'
+import { Download, Plus, TrendingUp, Clock, CheckCircle, Filter, Eye, X, FileText } from 'lucide-vue-next'
+import { listInvoices, getInvoice } from '@/services/api'
+import { useAuthStore } from '@/stores/auth'
 
-const invoices = [
-  { number: 'INV-2023-012', issued: 'Oct 24, 2023', due: 'Nov 07, 2023', amount: '$2,400.00', status: 'Paid' },
-  { number: 'INV-2023-011', issued: 'Oct 20, 2023', due: 'Nov 03, 2023', amount: '$1,240.00', status: 'Pending' },
-  { number: 'INV-2023-010', issued: 'Sep 15, 2023', due: 'Sep 29, 2023', amount: '$3,100.00', status: 'Overdue' }
-]
+const authStore = useAuthStore()
+
+const invoices = ref([])
+const loading = ref(false)
+const error = ref(null)
+const showDetailsModal = ref(false)
+const selectedInvoice = ref(null)
+const detailsLoading = ref(false)
+
+const totalInvoiced = computed(() => {
+  return invoices.value.reduce((sum, inv) => sum + parseFloat(inv.amount), 0).toFixed(2)
+})
+
+const pendingAmount = computed(() => {
+  return invoices.value
+    .filter(inv => inv.status === 'pending')
+    .reduce((sum, inv) => sum + parseFloat(inv.amount), 0)
+    .toFixed(2)
+})
+
+const paidThisMonth = computed(() => {
+  const now = new Date()
+  const currentMonth = now.getMonth()
+  const currentYear = now.getFullYear()
+  
+  return invoices.value
+    .filter(inv => {
+      const date = new Date(inv.date_issued)
+      return inv.status === 'paid' && 
+             date.getMonth() === currentMonth && 
+             date.getFullYear() === currentYear
+    })
+    .reduce((sum, inv) => sum + parseFloat(inv.amount), 0)
+    .toFixed(2)
+})
+
+async function fetchInvoices() {
+  loading.value = true
+  error.value = null
+  try {
+    const response = await listInvoices({ client_id: 1 })
+    invoices.value = response.invoices || []
+  } catch (err) {
+    error.value = err.response?.data?.message || 'Failed to load invoices'
+    console.error('Failed to fetch invoices:', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+async function openInvoiceDetails(invoice) {
+  selectedInvoice.value = { ...invoice }
+  showDetailsModal.value = true
+  detailsLoading.value = true
+  
+  try {
+    const response = await getInvoice(invoice.invoice_id)
+    selectedInvoice.value = response.invoice
+  } catch (err) {
+    console.error('Failed to fetch invoice details:', err)
+  } finally {
+    detailsLoading.value = false
+  }
+}
+
+function closeDetailsModal() {
+  showDetailsModal.value = false
+  selectedInvoice.value = null
+}
+
+function formatDate(dateString) {
+  if (!dateString) return 'N/A'
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
 
 function statusClass(status) {
   const classes = {
-    Paid: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-    Pending: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-    Overdue: 'bg-red-500/10 text-red-400 border-red-500/20'
+    paid: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+    pending: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+    overdue: 'bg-red-500/10 text-red-400 border-red-500/20'
   }
-  return classes[status] || ''
+  return classes[status?.toLowerCase()] || ''
 }
 
 function statusDotClass(status) {
   const classes = {
-    Paid: 'bg-emerald-500',
-    Pending: 'bg-amber-500 animate-pulse',
-    Overdue: 'bg-red-500'
+    paid: 'bg-emerald-500',
+    pending: 'bg-amber-500 animate-pulse',
+    overdue: 'bg-red-500'
   }
-  return classes[status] || ''
+  return classes[status?.toLowerCase()] || ''
 }
+
+onMounted(() => {
+  fetchInvoices()
+})
 </script>

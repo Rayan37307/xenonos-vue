@@ -1,34 +1,81 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { login as apiLogin, logout as apiLogout, getMe, setAuthToken } from '@/services/api'
 
 export const useAuthStore = defineStore('auth', () => {
   const isLoggedIn = ref(false)
   const userEmail = ref(null)
-  const userName = ref('Alex Rivera')
-  const userAvatar = ref('https://i.pravatar.cc/150?u=alex')
+  const userName = ref(null)
+  const userAvatar = ref(null)
+  const token = ref(null)
+  const loading = ref(false)
+  const error = ref(null)
 
   const isAuthenticated = computed(() => isLoggedIn.value)
 
-  function login(email) {
-    isLoggedIn.value = true
-    userEmail.value = email
-    localStorage.setItem('isLoggedIn', 'true')
-    localStorage.setItem('userEmail', email)
-  }
-
-  function logout() {
-    isLoggedIn.value = false
-    userEmail.value = null
-    localStorage.removeItem('isLoggedIn')
-    localStorage.removeItem('userEmail')
-  }
-
   function initAuth() {
-    const storedLogin = localStorage.getItem('isLoggedIn')
-    const storedEmail = localStorage.getItem('userEmail')
-    if (storedLogin === 'true') {
+    const storedToken = localStorage.getItem('auth_token')
+    const storedUser = localStorage.getItem('auth_user')
+    if (storedToken && storedUser) {
+      token.value = storedToken
+      const user = JSON.parse(storedUser)
+      userEmail.value = user.email
+      userName.value = user.name
+      userAvatar.value = user.avatar
       isLoggedIn.value = true
-      userEmail.value = storedEmail
+      setAuthToken(storedToken)
+    }
+  }
+
+  async function login(email, password) {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await apiLogin(email, password)
+      token.value = response.token
+      userEmail.value = response.user.email
+      userName.value = response.user.name
+      userAvatar.value = response.user.avatar
+      isLoggedIn.value = true
+      
+      localStorage.setItem('auth_token', response.token)
+      localStorage.setItem('auth_user', JSON.stringify(response.user))
+      setAuthToken(response.token)
+      
+      return response
+    } catch (err) {
+      error.value = err.response?.data?.message || 'Login failed'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function logout() {
+    try {
+      await apiLogout()
+    } catch (err) {
+      console.error('Logout error:', err)
+    }
+    token.value = null
+    userEmail.value = null
+    userName.value = null
+    userAvatar.value = null
+    isLoggedIn.value = false
+    localStorage.removeItem('auth_token')
+    localStorage.removeItem('auth_user')
+    setAuthToken(null)
+  }
+
+  async function fetchUser() {
+    try {
+      const response = await getMe()
+      userEmail.value = response.user.email
+      userName.value = response.user.name
+      userAvatar.value = response.user.avatar
+      localStorage.setItem('auth_user', JSON.stringify(response.user))
+    } catch (err) {
+      console.error('Failed to fetch user:', err)
     }
   }
 
@@ -37,9 +84,13 @@ export const useAuthStore = defineStore('auth', () => {
     userEmail,
     userName,
     userAvatar,
+    token,
+    loading,
+    error,
     isAuthenticated,
     login,
     logout,
-    initAuth
+    initAuth,
+    fetchUser
   }
 })
