@@ -37,14 +37,99 @@ This document tracks the integration status of backend API endpoints with the fr
 
 The following views exist in the frontend but **do not have corresponding backend API endpoints** documented in `BACKEND_API_DOCS.md`:
 
-### 1. **Messages** (`/messages` - Messages.vue)
+### 1. **Messages / Chat** (`/messages` - Messages.vue)
 - **Status:** ❌ No backend endpoint available
-- **Needed:** Messaging/conversation API
+- **Needed:** Messaging/conversation API with channels and direct messages
+- **Hardcoded UI:** Channels list, direct messages, message thread all static
 - **Suggested Endpoints:**
-  - `GET /messages` - List conversations
-  - `GET /messages/{id}` - Get conversation details
-  - `POST /messages` - Send message
-  - `GET /messages/{id}/thread` - Get message thread
+
+#### Channels
+```
+GET    /chat/channels                      - List all channels (public/private)
+POST   /chat/channels                      - Create new channel
+GET    /chat/channels/{id}                 - Get channel details
+PUT    /chat/channels/{id}                 - Update channel
+DELETE /chat/channels/{id}                 - Delete channel
+POST   /chat/channels/{id}/members         - Add members to channel
+DELETE /chat/channels/{id}/members/{userId} - Remove member from channel
+```
+
+#### Messages
+```
+GET    /chat/channels/{id}/messages        - Get messages in channel (paginated)
+POST   /chat/channels/{id}/messages        - Send message to channel
+PUT    /chat/messages/{id}                 - Edit message
+DELETE /chat/messages/{id}                 - Delete message
+POST   /chat/messages/{id}/reactions       - Add emoji reaction
+DELETE /chat/messages/{id}/reactions/{emoji} - Remove reaction
+```
+
+#### Direct Messages
+```
+GET    /chat/conversations                 - List all DM conversations
+POST   /chat/conversations                 - Start new DM with user
+GET    /chat/conversations/{id}/messages   - Get DM messages (paginated)
+POST   /chat/conversations/{id}/messages   - Send DM message
+```
+
+#### Utility
+```
+POST   /chat/messages/{id}/read            - Mark message as read
+GET    /chat/users/online-status           - Get user(s) online status
+POST   /chat/upload                        - Upload file attachment (multipart)
+GET    /chat/search                        - Search messages by content/user
+GET    /notifications/unread-count         - Get unread message count
+```
+
+**Example Response - List Channels:**
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "name": "feedback",
+      "description": "General feedback and suggestions",
+      "type": "public",
+      "unread_count": 2,
+      "last_message": "I've just uploaded the updated design assets",
+      "last_message_at": "2024-03-22T14:30:00Z",
+      "created_at": "2024-01-15T10:00:00Z",
+      "members_count": 12
+    }
+  ]
+}
+```
+
+**Example Response - Get Channel Messages:**
+```json
+{
+  "data": [
+    {
+      "id": 10,
+      "channel_id": 1,
+      "user_id": 2,
+      "user": {
+        "id": 2,
+        "name": "Sarah Jenkins",
+        "avatar": "https://i.pravatar.cc/150?u=sarah",
+        "role": "designer"
+      },
+      "content": "I've just uploaded the updated design assets for the dashboard.",
+      "attachments": [],
+      "reactions": [],
+      "read_by": [1, 3, 4],
+      "created_at": "2024-03-22T14:30:00Z",
+      "updated_at": "2024-03-22T14:30:00Z"
+    }
+  ],
+  "pagination": {
+    "total": 45,
+    "page": 1,
+    "per_page": 20,
+    "has_more": true
+  }
+}
+```
 
 ### 2. **Files** (`/files` - Files.vue)
 - **Status:** ❌ No backend endpoint available
