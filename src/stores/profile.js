@@ -12,10 +12,10 @@ export const useProfileStore = defineStore('profile', () => {
 
   // Computed
   const isAuthenticated = computed(() => !!profile.value)
-  
+
   const profileCompletion = computed(() => {
     if (!profile.value) return 0
-    
+
     let completed = 0
     const total = 6
 
@@ -35,25 +35,24 @@ export const useProfileStore = defineStore('profile', () => {
     error.value = null
     try {
       const response = await getProfile()
-      const user = response.user || response.data || response
-      
+      const user = response.user
+
       profile.value = {
-        id: user.id || null,
-        name: user.name || '',
+        id: user.id,
+        name: user.name,
         first_name: user.first_name || user.name?.split(' ')[0] || '',
         last_name: user.last_name || user.name?.split(' ')[1] || '',
-        email: user.email || '',
-        phone: user.phone || '',
+        email: user.email,
+        phone: user.phone_number || user.phone || '',
         username: user.username || '',
-        avatar_url: user.avatar_url || user.avatar || '',
-        role: user.role || '',
-        company_name: user.company_name || '',
+        avatar_url: user.avatar || user.profile_image_link || '',
+        role: user.role,
+        company_name: user.client_profile?.company_name || '',
       }
-      
+
       return profile.value
     } catch (err) {
       error.value = err.response?.data?.message || 'Failed to load profile'
-      console.error('Failed to load profile:', err)
       throw err
     } finally {
       loading.value = false
@@ -65,21 +64,24 @@ export const useProfileStore = defineStore('profile', () => {
     error.value = null
     try {
       const response = await updateProfile(payload)
-      const updatedUser = response.user || response.data || response
-      
-      // Update local state
-      if (profile.value) {
-        profile.value.first_name = updatedUser.first_name || profile.value.first_name
-        profile.value.last_name = updatedUser.last_name || profile.value.last_name
-        profile.value.email = updatedUser.email || profile.value.email
-        profile.value.phone = updatedUser.phone || profile.value.phone
-        profile.value.name = updatedUser.name || `${updatedUser.first_name} ${updatedUser.last_name}`.trim()
+      const user = response.user
+
+      profile.value = {
+        id: user.id,
+        name: user.name,
+        first_name: user.first_name || '',
+        last_name: user.last_name || '',
+        email: user.email,
+        phone: user.phone_number || user.phone || '',
+        username: user.username || '',
+        avatar_url: user.avatar || user.profile_image_link || '',
+        role: user.role,
+        company_name: user.client_profile?.company_name || '',
       }
-      
-      return updatedUser
+
+      return { success: true }
     } catch (err) {
       error.value = err.response?.data?.message || 'Failed to save profile'
-      console.error('Failed to save profile:', err)
       throw err
     } finally {
       saving.value = false
@@ -89,12 +91,10 @@ export const useProfileStore = defineStore('profile', () => {
   async function uploadAvatar(file) {
     error.value = null
     try {
-      // Validate file type
       if (!file.type.startsWith('image/')) {
         throw new Error('Please select an image file')
       }
 
-      // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         throw new Error('Image size must be less than 5MB')
       }
@@ -103,30 +103,24 @@ export const useProfileStore = defineStore('profile', () => {
       formData.append('avatar', file)
 
       const response = await updateAvatar(formData)
-      const avatarUrl = response.avatar_url || response.avatar || response.data?.avatar_url
-      
-      // Update local state
+      const user = response.user
+      const avatarUrl = user.avatar || user.profile_image_link
+
       if (profile.value) {
         profile.value.avatar_url = avatarUrl
       }
-      
+
       return avatarUrl
     } catch (err) {
-      error.value = err.response?.data?.message || err.message || 'Failed to upload avatar'
-      console.error('Failed to upload avatar:', err)
+      error.value = err.response?.data?.message || 'Failed to upload avatar'
       throw err
     }
   }
 
   async function fetchActivitySummary() {
-    try {
-      const response = await getActivitySummary()
-      activitySummary.value = response.data || response
-      return activitySummary.value
-    } catch (err) {
-      console.error('Failed to load activity summary:', err)
-      throw err
-    }
+    const response = await getActivitySummary()
+    activitySummary.value = response.data || response
+    return activitySummary.value
   }
 
   function clearProfile() {
@@ -138,16 +132,13 @@ export const useProfileStore = defineStore('profile', () => {
   }
 
   return {
-    // State
     profile,
     activitySummary,
     loading,
     error,
     saving,
-    // Computed
     isAuthenticated,
     profileCompletion,
-    // Actions
     fetchProfile,
     saveProfileData,
     uploadAvatar,

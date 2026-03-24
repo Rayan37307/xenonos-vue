@@ -138,7 +138,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import AppLayout from '@/components/AppLayout.vue'
 import { Camera, User, Info, Copy } from 'lucide-vue-next'
 import { useProfileStore } from '@/stores/profile'
@@ -181,48 +181,28 @@ const userId = computed(() => {
   return '-'
 })
 
-// Watch for store changes and update local state
-watch(
-  () => profileStore.profile,
-  (newProfile) => {
-    if (newProfile) {
-      localProfile.value = { ...newProfile }
-    }
-  },
-  { immediate: true, deep: true }
-)
-
 // Methods
 async function loadProfile() {
-  try {
-    await profileStore.fetchProfile()
-  } catch (error) {
-    // Error handled in store
-  }
+  await profileStore.fetchProfile()
+  localProfile.value = { ...profileStore.profile }
 }
 
 async function saveProfile() {
-  try {
-    const payload = {
-      first_name: localProfile.value.first_name,
-      last_name: localProfile.value.last_name,
-      email: localProfile.value.email,
-      phone: localProfile.value.phone,
-    }
-    
-    await profileStore.saveProfileData(payload)
-    
-    // Update auth store
-    if (authStore.isAuthenticated) {
-      authStore.userName.value = localProfile.value.name
-      authStore.userEmail.value = localProfile.value.email
-    }
-    
-    // Show success feedback
-    alert('Profile updated successfully!')
-  } catch (error) {
-    alert('Failed to save profile: ' + (profileStore.error || 'Unknown error'))
+  const payload = {
+    first_name: localProfile.value.first_name,
+    last_name: localProfile.value.last_name,
+    email: localProfile.value.email,
+    phone: localProfile.value.phone,
   }
+
+  await profileStore.saveProfileData(payload)
+  localProfile.value = { ...profileStore.profile }
+
+  // Update auth store
+  authStore.userName.value = profileStore.profile.name
+  authStore.userEmail.value = profileStore.profile.email
+
+  alert('Profile updated successfully!')
 }
 
 function triggerAvatarUpload() {
@@ -233,22 +213,9 @@ async function handleAvatarUpload(event) {
   const file = event.target.files[0]
   if (!file) return
 
-  try {
-    const avatarUrl = await profileStore.uploadAvatar(file)
-    
-    // Update auth store
-    if (authStore.isAuthenticated) {
-      authStore.userAvatar.value = avatarUrl
-    }
-    
-    // Show success feedback
-    alert('Avatar updated successfully!')
-  } catch (error) {
-    alert('Failed to upload avatar: ' + (profileStore.error || 'Unknown error'))
-  } finally {
-    // Reset input
-    event.target.value = ''
-  }
+  const avatarUrl = await profileStore.uploadAvatar(file)
+  authStore.userAvatar.value = avatarUrl
+  alert('Avatar updated successfully!')
 }
 
 function copyUserId() {
@@ -259,11 +226,7 @@ function copyUserId() {
 }
 
 async function loadActivitySummary() {
-  try {
-    await profileStore.fetchActivitySummary()
-  } catch (error) {
-    // Error handled in store
-  }
+  await profileStore.fetchActivitySummary()
 }
 
 // Lifecycle

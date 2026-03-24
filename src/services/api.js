@@ -41,7 +41,21 @@ export async function getProfile() {
 }
 
 export async function updateProfile(data) {
-  const response = await api.put('/user/profile', data)
+  const payload = { ...data }
+  // Map frontend field names to backend field names
+  if (payload.phone) {
+    payload.phone_number = payload.phone
+    delete payload.phone
+  }
+  // Combine first_name and last_name into name if needed
+  if (payload.first_name || payload.last_name) {
+    const firstName = payload.first_name || ''
+    const lastName = payload.last_name || ''
+    if (firstName && lastName) {
+      payload.name = `${firstName} ${lastName}`.trim()
+    }
+  }
+  const response = await api.put('/user/profile', payload)
   return response.data
 }
 
