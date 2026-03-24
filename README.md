@@ -138,6 +138,16 @@ xenonos-vue/
 
 ---
 
+## 🔗 Backend Repository
+
+This frontend connects to a separate Laravel 12 API backend.
+
+**Backend Repo:** [xenonos-api](#) _(coming soon)_
+
+> ⚠️ **Note:** You need the backend API running to use this application. See the [API Integration Guide](./API_INTEGRATION.md) for setup instructions.
+
+---
+
 ## 👥 Contributors
 
 - **Tasin** - Xenon Studios
