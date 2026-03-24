@@ -34,6 +34,31 @@ export async function getMe() {
   return response.data
 }
 
+// Profile
+export async function getProfile() {
+  const response = await api.get('/user/profile')
+  return response.data
+}
+
+export async function updateProfile(data) {
+  const response = await api.put('/user/profile', data)
+  return response.data
+}
+
+export async function updateAvatar(formData) {
+  const response = await api.post('/auth/avatar', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
+  return response.data
+}
+
+export async function getActivitySummary() {
+  const response = await api.get('/user/activity-summary')
+  return response.data
+}
+
 // Invoices
 export async function listInvoices(filters = {}) {
   const response = await api.get('/invoices', { params: filters })
