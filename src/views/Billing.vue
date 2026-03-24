@@ -7,12 +7,12 @@
           <p class="text-slate-400 text-sm mt-2 font-medium outfit">Manage your subscriptions, invoices, and payment methods.</p>
         </div>
         <div class="flex items-center gap-4">
-          <button class="bg-surface-container-high border border-white/5 px-6 py-3.5 rounded-xl text-[10px] font-bold uppercase tracking-widest text-slate-300 hover:bg-[#2d3a4d] transition-all ubuntu flex items-center gap-2">
+          <!-- <button class="bg-surface-container-high border border-white/5 px-6 py-3.5 rounded-xl text-[10px] font-bold uppercase tracking-widest text-slate-300 hover:bg-[#2d3a4d] transition-all ubuntu flex items-center gap-2">
             <Download class="w-4 h-4 text-slate-400" /> Download All
-          </button>
-          <button class="bg-primary text-white px-6 py-3.5 rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:shadow-[0_0_30px_rgba(99,102,241,0.3)] transition-all hover:bg-[#5355e1] ubuntu flex items-center gap-2">
+          </button> -->
+          <!-- <button class="bg-primary text-white px-6 py-3.5 rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:shadow-[0_0_30px_rgba(99,102,241,0.3)] transition-all hover:bg-[#5355e1] ubuntu flex items-center gap-2">
             <Plus class="w-4 h-4" /> Add Payment Method
-          </button>
+          </button> -->
         </div>
       </header>
 
@@ -53,14 +53,31 @@
       </section>
 
       <section class="bg-surface/60 border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
-        <div class="p-8 flex justify-between items-center bg-surface-container/50 border-b border-white/5">
-          <div>
-            <h3 class="text-xl font-bold text-white tracking-tight font-headline">Recent Invoices</h3>
-            <p class="text-xs text-slate-500 mt-1 outfit">View and manage your payment history.</p>
+        <div class="p-8 bg-surface-container/50 border-b border-white/5">
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <h3 class="text-xl font-bold text-white tracking-tight font-headline">Recent Invoices</h3>
+              <p class="text-xs text-slate-500 mt-1 outfit">View and manage your payment history.</p>
+            </div>
+            <div class="flex p-1 bg-surface-container/80 backdrop-blur-md border border-white/5 rounded-xl">
+              <button 
+                @click="statusFilter = 'all'"
+                :class="['px-5 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ubuntu', statusFilter === 'all' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-slate-500 hover:text-slate-300']"
+              >All</button>
+              <button 
+                @click="statusFilter = 'pending'"
+                :class="['px-5 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ubuntu', statusFilter === 'pending' ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20' : 'text-slate-500 hover:text-slate-300']"
+              >Pending</button>
+              <button 
+                @click="statusFilter = 'paid'"
+                :class="['px-5 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ubuntu', statusFilter === 'paid' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'text-slate-500 hover:text-slate-300']"
+              >Paid</button>
+              <button 
+                @click="statusFilter = 'rejected'"
+                :class="['px-5 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ubuntu', statusFilter === 'rejected' ? 'bg-red-500 text-white shadow-lg shadow-red-500/20' : 'text-slate-500 hover:text-slate-300']"
+              >Rejected</button>
+            </div>
           </div>
-          <button class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 transition-all flex items-center justify-center">
-            <Filter class="w-5 h-5" />
-          </button>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left min-w-[800px]">
@@ -88,7 +105,7 @@
                   {{ error }}
                 </td>
               </tr>
-              <tr v-else v-for="invoice in invoices" :key="invoice.invoice_id" class="group hover:bg-primary/[0.02] transition-colors cursor-pointer">
+              <tr v-else v-for="invoice in filteredInvoices" :key="invoice.invoice_id" class="group hover:bg-primary/[0.02] transition-colors cursor-pointer">
                 <td class="px-8 py-6">
                   <span class="text-sm font-bold text-white group-hover:text-primary transition-colors font-headline">#{{ invoice.invoice_id }}</span>
                 </td>
@@ -200,7 +217,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import AppLayout from '@/components/AppLayout.vue'
-import { Download, Plus, TrendingUp, Clock, CheckCircle, Filter, Eye, X, FileText } from 'lucide-vue-next'
+import { Download, Plus, TrendingUp, Clock, CheckCircle, Eye, X, FileText } from 'lucide-vue-next'
 import { listInvoices, getInvoice } from '@/services/api'
 import { useAuthStore } from '@/stores/auth'
 
@@ -212,6 +229,7 @@ const error = ref(null)
 const showDetailsModal = ref(false)
 const selectedInvoice = ref(null)
 const detailsLoading = ref(false)
+const statusFilter = ref('all')
 
 const totalInvoiced = computed(() => {
   return invoices.value.reduce((sum, inv) => sum + parseFloat(inv.amount), 0).toFixed(2)
@@ -228,16 +246,23 @@ const paidThisMonth = computed(() => {
   const now = new Date()
   const currentMonth = now.getMonth()
   const currentYear = now.getFullYear()
-  
+
   return invoices.value
     .filter(inv => {
       const date = new Date(inv.date_issued)
-      return inv.status === 'paid' && 
-             date.getMonth() === currentMonth && 
+      return inv.status === 'paid' &&
+             date.getMonth() === currentMonth &&
              date.getFullYear() === currentYear
     })
     .reduce((sum, inv) => sum + parseFloat(inv.amount), 0)
     .toFixed(2)
+})
+
+const filteredInvoices = computed(() => {
+  if (statusFilter.value === 'all') {
+    return invoices.value
+  }
+  return invoices.value.filter(inv => inv.status?.toLowerCase() === statusFilter.value)
 })
 
 async function fetchInvoices() {
@@ -284,7 +309,8 @@ function statusClass(status) {
   const classes = {
     paid: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
     pending: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-    overdue: 'bg-red-500/10 text-red-400 border-red-500/20'
+    overdue: 'bg-red-500/10 text-red-400 border-red-500/20',
+    rejected: 'bg-red-500/10 text-red-400 border-red-500/20'
   }
   return classes[status?.toLowerCase()] || ''
 }
@@ -293,7 +319,8 @@ function statusDotClass(status) {
   const classes = {
     paid: 'bg-emerald-500',
     pending: 'bg-amber-500 animate-pulse',
-    overdue: 'bg-red-500'
+    overdue: 'bg-red-500',
+    rejected: 'bg-red-500'
   }
   return classes[status?.toLowerCase()] || ''
 }

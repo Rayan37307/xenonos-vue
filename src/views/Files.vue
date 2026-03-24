@@ -10,9 +10,9 @@
           <button class="px-6 py-3.5 bg-surface-container-high border border-white/5 text-slate-300 rounded-xl text-[10px] uppercase tracking-widest font-bold flex items-center gap-2 hover:bg-[#2d3a4d] hover:text-white transition-all ubuntu">
             <Filter class="w-4 h-4" /> Filter
           </button>
-          <button class="px-6 py-3.5 bg-primary text-white rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:shadow-[0_0_30px_rgba(99,102,241,0.3)] transition-all hover:bg-[#5355e1] ubuntu flex items-center gap-2">
+          <!-- <button class="px-6 py-3.5 bg-primary text-white rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:shadow-[0_0_30px_rgba(99,102,241,0.3)] transition-all hover:bg-[#5355e1] ubuntu flex items-center gap-2">
             <Plus class="w-4 h-4" /> Request Upload
-          </button>
+          </button> -->
         </div>
       </div>
 
