@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Details | Xenon Studios</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../styles/theme.css">
+    <link rel="stylesheet" href="../styles/responsive.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-[#0B0F19] text-on-surface font-sans antialiased overflow-x-hidden min-h-screen">
+    
+    <!-- Background Elements -->
+    <div class="fixed inset-0 pointer-events-none z-[-1] overflow-hidden">
+        <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#6366F1]/5 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-[0%] right-[0%] w-[40%] h-[40%] bg-[#6366F1]/5 rounded-full blur-[100px]"></div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside id="app-sidebar" class="h-screen w-64 fixed left-0 top-0 flex flex-col bg-[#0B0F19] border-r border-white/5 z-[60] -translate-x-full md:translate-x-0 transition-transform duration-300">
+        <div class="p-8 mb-4">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-[#6366F1] rounded-lg flex items-center justify-center shadow-lg shadow-[#6366F1]/20">
+                    <span class="text-white font-black text-xl space-font">X</span>
+                </div>
+                <h1 class="text-lg font-bold text-white tracking-tight font-headline">Xenon Studios</h1>
+            </div>
+            <button onclick="toggleMobileMenu()" class="md:hidden p-2 text-slate-400 hover:text-white rounded-lg absolute right-4 top-8"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+
+        <nav class="flex-1 px-4 space-y-1 overflow-y-auto no-scrollbar">
+            <a href="dashboard.html" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-slate-400 hover:text-slate-200 hover:bg-white/5">
+                <i data-lucide="layout-dashboard" class="w-5 h-5 text-slate-400 group-hover:text-slate-200 transition-colors"></i>
+                <span class="text-sm font-medium outfit">Dashboard</span>
+            </a>
+            <a href="messages.html" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-slate-400 hover:text-slate-200 hover:bg-white/5">
+                <i data-lucide="message-square" class="w-5 h-5 text-slate-400 group-hover:text-slate-200 transition-colors"></i>
+                <span class="text-sm font-medium outfit">Messages</span>
+            </a>
+            <a href="projects.html" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-slate-400 hover:text-slate-200 hover:bg-white/5">
+                <i data-lucide="folder-open" class="w-5 h-5 text-slate-400 group-hover:text-slate-200 transition-colors"></i>
+                <span class="text-sm font-medium outfit">Projects</span>
+            </a>
+            <a href="files.html" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-slate-400 hover:text-slate-200 hover:bg-white/5">
+                <i data-lucide="folder-archive" class="w-5 h-5 text-slate-400 group-hover:text-slate-200 transition-colors"></i>
+                <span class="text-sm font-medium outfit">Files</span>
+            </a>
+            <a href="services.html" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-slate-400 hover:text-slate-200 hover:bg-white/5">
+                <i data-lucide="layers" class="w-5 h-5 text-slate-400 group-hover:text-slate-200 transition-colors"></i>
+                <span class="text-sm font-medium outfit">Order Services</span>
+            </a>
+            <a href="billing.html" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-slate-400 hover:text-slate-200 hover:bg-white/5">
+                <i data-lucide="credit-card" class="w-5 h-5 text-slate-400 group-hover:text-slate-200 transition-colors"></i>
+                <span class="text-sm font-medium outfit">Billing</span>
+            </a>
+            <a href="profile.html" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-slate-400 hover:text-slate-200 hover:bg-white/5">
+                <i data-lucide="user" class="w-5 h-5 text-slate-400 group-hover:text-slate-200 transition-colors"></i>
+                <span class="text-sm font-medium outfit">Profile</span>
+            </a>
+            <a href="notifications.html" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group bg-[#6366F1]/10 text-[#6366F1]">
+                <i data-lucide="bell" class="w-5 h-5 text-[#6366F1]"></i>
+                <span class="text-sm font-medium outfit">Notifications</span>
+                <span class="ml-auto bg-[#6366F1] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full ubuntu space-font">12</span>
+            </a>
+            <a href="settings-hub.html" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-slate-400 hover:text-slate-200 hover:bg-white/5">
+                <i data-lucide="settings" class="w-5 h-5 text-slate-400 group-hover:text-slate-200 transition-colors"></i>
+                <span class="text-sm font-medium outfit">Settings</span>
+            </a>
+        </nav>
+
+        <div class="p-4 mt-auto border-t border-white/5">
+            <button onclick="handleDemoLogout()" class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-red-400 transition-colors group">
+                <i data-lucide="log-out" class="w-5 h-5 group-hover:text-red-400 transition-colors"></i>
+                <span class="text-sm font-medium outfit">Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <main class="ml-0 md:ml-64 min-h-screen flex flex-col pt-20">
+        <!-- TopNav -->
+        <header class="fixed top-0 right-0 w-full md:w-[calc(100%-16rem)] h-20 z-40 bg-[#111827]/80 backdrop-blur-xl flex items-center justify-between px-10 border-b border-white/5">
+            <div class="flex items-center gap-4 lg:gap-10 min-w-fit">
+                <button onclick="toggleMobileMenu()" class="p-2 md:hidden text-slate-400 hover:text-white rounded-xl hover:bg-white/5 transition-all">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+                <h2 class="text-xl font-bold text-white tracking-tight font-headline">Notifications Center</h2>
+                
+                <nav class="hidden xl:flex items-center gap-8">
+                    <button onclick="window.location.href='settings-hub.html'" class="px-5 py-2 bg-[#1F2937] text-[#dfe2f1] text-[10px] font-bold uppercase tracking-[0.2em] rounded-xl hover:text-white hover:bg-[#2d3a4d] transition-all border border-white/5 shadow-xl ubuntu">
+                        Settings
+                    </button>
+                    <button onclick="supportAction()" class="text-slate-500 text-[10px] font-bold uppercase tracking-[0.2em] hover:text-white transition-all ubuntu">
+                        Support
+                    </button>
+                </nav>
+            </div>
+
+            <div class="flex-1 flex justify-center px-16 hidden lg:flex">
+                <div class="relative w-full max-w-2xl group">
+                    <i data-lucide="search" class="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-[#6366F1] transition-colors w-[18px] h-[18px]"></i>
+                    <input type="text" placeholder="Search workspace..." class="w-full bg-[#1F2937]/50 border border-white/5 rounded-[1.25rem] py-3 pl-14 pr-6 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#6366F1]/40 focus:bg-[#1F2937] transition-all shadow-inner outfit">
+                </div>
+            </div>
+
+            <div class="flex items-center gap-8 min-w-fit">
+                <div class="flex items-center gap-2">
+                    <button onclick="window.location.href='notifications.html'" class="p-2.5 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all relative group">
+                        <i data-lucide="bell" class="w-[22px] h-[22px]"></i>
+                        <span class="absolute top-2.5 right-2.5 w-2 h-2 bg-[#6366F1] rounded-full border-2 border-[#111827] group-hover:scale-125 transition-transform"></span>
+                    </button>
+                    <button onclick="supportAction()" class="p-2.5 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all hidden sm:block">
+                        <i data-lucide="help-circle" class="w-[22px] h-[22px]"></i>
+                    </button>
+                </div>
+
+                <div class="h-8 w-px bg-white/10 hidden sm:block"></div>
+
+                <button onclick="window.location.href='profile.html'" class="flex items-center gap-4 group">
+                    <div class="flex items-center gap-3 hidden lg:flex">
+                        <p class="text-sm font-bold text-white group-hover:text-[#6366F1] transition-colors tracking-tight outfit">Alex Rivera</p>
+                        <i data-lucide="chevron-down" class="text-slate-600 group-hover:text-white transition-colors w-4 h-4"></i>
+                    </div>
+                    <div class="w-11 h-11 rounded-full p-0.5 bg-gradient-to-tr from-[#6366F1] to-transparent border border-white/5 shadow-2xl group-hover:scale-105 transition-transform shrink-0">
+                        <img src="https://i.pravatar.cc/150?u=alex" alt="Alex Rivera" class="w-full h-full rounded-full object-cover border-2 border-[#111827]">
+                    </div>
+                </button>
+            </div>
+        </header>
+
+        <!-- Dynamic Content Area -->
+        <div class="px-10 pb-12 pt-8 flex-1 flex justify-center">
+            
+            <div class="w-full max-w-4xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                
+                <!-- Back Navigation -->
+                <button onclick="window.location.href='notifications.html'" class="flex items-center gap-2 text-slate-400 hover:text-[#6366F1] transition-colors font-bold text-[10px] uppercase tracking-widest ubuntu">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Inbox
+                </button>
+
+                <!-- Detail Card -->
+                <div class="bg-[#0B0F19]/80 border border-white/5 rounded-3xl overflow-hidden shadow-2xl relative">
+                    <!-- Glass reflection -->
+                    <div class="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent pointer-events-none"></div>
+                    
+                    <!-- Header Area -->
+                    <div class="p-8 md:p-12 border-b border-white/5 relative bg-[#111827]/30">
+                        
+                        <div class="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-8">
+                            <div class="flex items-start gap-4 md:gap-6">
+                                <div class="w-14 h-14 rounded-2xl bg-blue-500/10 flex items-center justify-center shrink-0 border border-blue-500/20 shadow-inner mt-1">
+                                    <i data-lucide="info" class="w-7 h-7 text-blue-400"></i>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="flex flex-wrap items-center gap-3">
+                                        <h1 class="text-3xl font-bold text-white tracking-tight font-headline">Project Update</h1>
+                                    </div>
+                                    <p class="text-[11px] text-slate-500 uppercase tracking-widest font-bold ubuntu flex items-center gap-2">
+                                        <i data-lucide="calendar" class="w-3.5 h-3.5"></i> Oct 24, 2026 • 14:32 PST
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex gap-3 shrink-0">
+                                <button class="w-10 h-10 rounded-xl bg-[#1F2937] border border-white/5 flex items-center justify-center text-slate-400 hover:text-white hover:bg-[#2d3a4d] transition-all shadow-xl group">
+                                    <i data-lucide="star" class="w-5 h-5 group-hover:fill-amber-400 group-hover:text-amber-400 transition-colors"></i>
+                                </button>
+                                <button class="w-10 h-10 rounded-xl bg-[#1F2937] border border-white/5 flex items-center justify-center text-slate-400 hover:text-white hover:bg-[#2d3a4d] transition-all shadow-xl">
+                                    <i data-lucide="share-2" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Meta Info Row -->
+                        <div class="flex flex-wrap items-center gap-6 pt-6 border-t border-white/5">
+                            <div class="flex items-center gap-3">
+                                <img src="https://i.pravatar.cc/150?u=alex" alt="Alex Rivera" class="w-8 h-8 rounded-lg border border-white/10 object-cover">
+                                <div class="space-y-0.5">
+                                    <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest ubuntu">Generated By</p>
+                                    <p class="text-sm font-bold text-white outfit">Alex Rivera</p>
+                                </div>
+                            </div>
+                            <div class="w-px h-8 bg-white/10 hidden md:block"></div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-[#2d3a4d] border border-white/5 flex items-center justify-center">
+                                    <i data-lucide="folder" class="w-4 h-4 text-slate-300"></i>
+                                </div>
+                                <div class="space-y-0.5">
+                                    <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest ubuntu">Related Entity</p>
+                                    <p class="text-sm font-bold text-white outfit hover:text-[#6366F1] transition-colors cursor-pointer">Neo-Finance App</p>
+                                </div>
+                            </div>
+                            <div class="w-px h-8 bg-white/10 hidden md:block"></div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                                    <i data-lucide="activity" class="w-4 h-4 text-emerald-400"></i>
+                                </div>
+                                <div class="space-y-0.5">
+                                    <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest ubuntu">Status Change</p>
+                                    <p class="text-sm font-bold text-emerald-400 outfit tracking-tight">Moved to "In Progress"</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Body Content Area -->
+                    <div class="p-8 md:p-12">
+                        <div class="prose prose-invert prose-slate max-w-none outfit">
+                            <p class="text-xl text-[#dfe2f1] leading-relaxed font-medium mb-6">
+                                The <strong class="text-white tracking-tight">Neo-Finance App Redesign</strong> project phase has been officially updated. Alex Rivera has transitioned the project status from "Pending" to <strong class="text-white tracking-tight">"In Progress"</strong>. 
+                            </p>
+                            <p class="text-slate-400 leading-relaxed mb-6">
+                                This status shift unlocks new milestones in the roadmap and active time-tracking capabilities for all assigned team members. Ensure that your local repositories are synced with the latest design tokens and the updated timeline is reviewed.
+                            </p>
+
+                            <!-- Attachment / Additional Context Card -->
+                            <div class="mt-10 bg-[#1F2937]/30 border border-white/5 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6 hover:border-[#6366F1]/30 transition-colors">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center border border-orange-500/20 shrink-0">
+                                        <i data-lucide="file-text" class="w-6 h-6 text-orange-400"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-base font-bold text-white outfit mb-1">Project Brief v2.pdf</h4>
+                                        <p class="text-[10px] uppercase font-bold tracking-widest text-slate-500 ubuntu space-font">2.4 MB • Document</p>
+                                    </div>
+                                </div>
+                                <button class="w-full sm:w-auto px-5 py-2 bg-white/5 hover:bg-white/10 text-white text-[10px] font-bold uppercase tracking-widest rounded-xl transition-colors border border-white/10 ubuntu flex items-center justify-center gap-2">
+                                    <i data-lucide="download" class="w-3.5 h-3.5"></i> Download
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Action Bar -->
+                        <div class="mt-12 pt-8 border-t border-white/5 flex flex-wrap items-center gap-4">
+                            <button onclick="window.location.href='project-details.html'" class="px-8 py-3.5 bg-[#6366F1] text-white rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:shadow-[0_0_30px_rgba(99,102,241,0.3)] transition-all hover:bg-[#5355e1] active:scale-95 ubuntu flex items-center gap-2">
+                                <i data-lucide="external-link" class="w-4 h-4"></i> View Project
+                            </button>
+                            <button class="px-8 py-3.5 bg-[#1F2937] border border-white/5 hover:bg-[#2d3a4d] text-white rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ubuntu flex items-center gap-2">
+                                <i data-lucide="message-square" class="w-4 h-4 text-slate-400"></i> Reply
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <footer class="px-10 py-6 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] text-slate-500 uppercase tracking-widest font-bold ubuntu bg-[#0B0F19]/80 backdrop-blur-md">
+            <div class="flex items-center gap-4">
+                <span class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]"></span>
+                    Systems Operational
+                </span>
+                <span class="h-1 w-1 bg-white/10 rounded-full"></span>
+                <span class="space-font">Last Updated: 2 mins ago</span>
+            </div>
+            <div>
+                © 2026 Xenon Studios • v3.1.0-nexus
+            </div>
+        </footer>
+    </main>
+
+    <script src="../js/shared.js"></script>
+</body>
+</html>

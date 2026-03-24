@@ -30,17 +30,27 @@ export const useNotificationsStore = defineStore('notifications', () => {
       'custom': { icon: 'Info', bgClass: 'bg-blue-500/10 border border-blue-500/20', textClass: 'text-blue-400' },
     }
 
-    const iconConfig = typeIcons[apiNotification.type] || typeIcons['custom']
+    // Extract data from nested data object (Laravel notification format)
+    const notificationData = apiNotification.data || {}
+    const title = notificationData.title || apiNotification.title || 'Notification'
+    const message = notificationData.message || apiNotification.message || ''
+    
+    // Determine notification type for icon mapping
+    const notificationType = notificationData.type || apiNotification.type || 'custom'
+    const iconConfig = typeIcons[notificationType] || typeIcons['custom']
+
+    // Handle both 'read' boolean and 'read_at' timestamp formats
+    const isRead = apiNotification.read_at !== null || apiNotification.read === true
 
     return {
       id: apiNotification.id,
       type: apiNotification.type,
-      title: apiNotification.title,
-      message: apiNotification.message,
-      data: apiNotification.data || {},
+      title: title,
+      message: message,
+      data: notificationData,
       read_at: apiNotification.read_at,
       created_at: apiNotification.created_at,
-      unread: !apiNotification.read_at,
+      unread: !isRead,
       icon: iconConfig.icon,
       bgClass: iconConfig.bgClass,
       textClass: iconConfig.textClass,

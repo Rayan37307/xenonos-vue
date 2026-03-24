@@ -79,6 +79,11 @@ export async function getNotifications(includeRead = false) {
   return response.data
 }
 
+export async function getNotification(notificationId) {
+  const response = await api.get(`/notifications/${notificationId}`)
+  return response.data
+}
+
 export async function getUnreadCount() {
   const response = await api.get('/notifications/unread-count')
   return response.data
@@ -101,6 +106,32 @@ export async function sendNotification(payload) {
 
 export async function deleteNotification(notificationId) {
   const response = await api.delete(`/notifications/${notificationId}`)
+  return response.data
+}
+
+// Projects
+export async function listProjects(params = {}) {
+  const response = await api.get('/projects', { params })
+  return response.data
+}
+
+export async function getProject(id) {
+  const response = await api.get(`/projects/${id}`)
+  return response.data
+}
+
+export async function createProject(data) {
+  const response = await api.post('/projects', data)
+  return response.data
+}
+
+export async function updateProject(id, data) {
+  const response = await api.put(`/projects/${id}`, data)
+  return response.data
+}
+
+export async function deleteProject(id) {
+  const response = await api.delete(`/projects/${id}`)
   return response.data
 }
 

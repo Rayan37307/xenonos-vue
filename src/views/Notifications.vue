@@ -95,14 +95,8 @@ function handleNotificationClick(notification) {
   if (notification.unread) {
     notificationsStore.markNotificationAsRead(notification.id)
   }
-  // Navigate based on notification type
-  if (notification.data?.task_id) {
-    router.push(`/tasks/${notification.data.task_id}`)
-  } else if (notification.data?.project_id) {
-    router.push(`/projects/${notification.data.project_id}`)
-  } else if (notification.data?.invoice_id) {
-    router.push(`/invoices/${notification.data.invoice_id}`)
-  }
+  // Navigate to notification details page
+  router.push({ name: 'NotificationDetails', query: { id: notification.id } })
 }
 
 async function loadNotifications() {

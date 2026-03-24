@@ -102,10 +102,11 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-    path: '/notification-details',
+    path: '/notification-details/:id?',
     name: 'NotificationDetails',
     component: NotificationDetails,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
+    props: true
   },
   {
     path: '/notifications-settings',
