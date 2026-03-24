@@ -137,13 +137,94 @@ export async function deleteProject(id) {
 
 // Invoices
 export async function listInvoices(filters = {}) {
-  const response = await api.get('/invoices', { params: filters })
-  return response.data
+  try {
+    const response = await api.get('/invoices', { params: filters })
+    return response.data
+  } catch (error) {
+    return { invoices: [] }
+  }
 }
 
 export async function getInvoice(id) {
   const response = await api.get(`/invoices/${id}`)
   return response.data
+}
+
+// Dashboard/Analytics
+export async function getDashboardStats() {
+  try {
+    const response = await api.get('/analytics/dashboard')
+    return response.data
+  } catch (error) {
+    // Return default stats if endpoint doesn't exist
+    return {
+      total_projects: 0,
+      completion_rate: 0,
+      ongoing_tasks: 0,
+      team_bandwidth: 0,
+      tasks_due_today: 0
+    }
+  }
+}
+
+export async function getRecentProjects() {
+  try {
+    const response = await api.get('/analytics/recent-projects')
+    return response.data
+  } catch (error) {
+    // Return empty array if endpoint doesn't exist
+    return { projects: [] }
+  }
+}
+
+export async function getActiveTasks() {
+  try {
+    const response = await api.get('/analytics/active-tasks')
+    return response.data
+  } catch (error) {
+    // Return empty array if endpoint doesn't exist
+    return { tasks: [] }
+  }
+}
+
+// Tasks
+export async function listTasks(params = {}) {
+  try {
+    const response = await api.get('/tasks', { params })
+    return response.data
+  } catch (error) {
+    return { tasks: [] }
+  }
+}
+
+export async function getTask(id) {
+  const response = await api.get(`/tasks/${id}`)
+  return response.data
+}
+
+// Services/Orders
+export async function listServices(params = {}) {
+  try {
+    const response = await api.get('/services', { params })
+    return response.data
+  } catch (error) {
+    return { services: [] }
+  }
+}
+
+export async function getService(id) {
+  const response = await api.get(`/services/${id}`)
+  return response.data
+}
+
+// Files
+export async function listFiles(params = {}) {
+  try {
+    const response = await api.get('/files', { params })
+    return response.data
+  } catch (error) {
+    return { files: [] }
+  }
 }
 
 export default api
