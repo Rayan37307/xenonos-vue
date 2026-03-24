@@ -73,6 +73,37 @@ export async function getActivitySummary() {
   return response.data
 }
 
+// Notifications
+export async function getNotifications(includeRead = false) {
+  const response = await api.get('/notifications', { params: { include_read: includeRead } })
+  return response.data
+}
+
+export async function getUnreadCount() {
+  const response = await api.get('/notifications/unread-count')
+  return response.data
+}
+
+export async function markAsRead(notificationId) {
+  const response = await api.post(`/notifications/${notificationId}/read`)
+  return response.data
+}
+
+export async function markAllAsRead() {
+  const response = await api.post('/notifications/read-all')
+  return response.data
+}
+
+export async function sendNotification(payload) {
+  const response = await api.post('/notifications/send', payload)
+  return response.data
+}
+
+export async function deleteNotification(notificationId) {
+  const response = await api.delete(`/notifications/${notificationId}`)
+  return response.data
+}
+
 // Invoices
 export async function listInvoices(filters = {}) {
   const response = await api.get('/invoices', { params: filters })

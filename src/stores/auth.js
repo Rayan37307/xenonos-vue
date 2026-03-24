@@ -70,10 +70,12 @@ export const useAuthStore = defineStore('auth', () => {
   async function fetchUser() {
     try {
       const response = await getMe()
-      userEmail.value = response.user.email
-      userName.value = response.user.name
-      userAvatar.value = response.user.avatar
-      localStorage.setItem('auth_user', JSON.stringify(response.user))
+      // Handle both response structures: { user: {...} } or direct user object
+      const user = response.user || response
+      userEmail.value = user.email
+      userName.value = user.name
+      userAvatar.value = user.avatar
+      localStorage.setItem('auth_user', JSON.stringify(user))
     } catch (err) {
       console.error('Failed to fetch user:', err)
     }

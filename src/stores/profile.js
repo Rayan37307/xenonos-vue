@@ -35,7 +35,8 @@ export const useProfileStore = defineStore('profile', () => {
     error.value = null
     try {
       const response = await getProfile()
-      const user = response.user
+      // Handle both response structures: { user: {...} } or direct user object
+      const user = response.user || response
 
       profile.value = {
         id: user.id,
@@ -64,13 +65,19 @@ export const useProfileStore = defineStore('profile', () => {
     error.value = null
     try {
       const response = await updateProfile(payload)
-      const user = response.user
+      // Handle both response structures: { user: {...} } or direct user object
+      const user = response.user || response
+
+      // Split the name from API response to get first_name and last_name
+      const nameParts = (user.name || '').split(' ')
+      const firstName = nameParts[0] || ''
+      const lastName = nameParts.slice(1).join(' ') || ''
 
       profile.value = {
         id: user.id,
         name: user.name,
-        first_name: user.first_name || '',
-        last_name: user.last_name || '',
+        first_name: firstName,
+        last_name: lastName,
         email: user.email,
         phone: user.phone_number || user.phone || '',
         username: user.username || '',
@@ -103,7 +110,8 @@ export const useProfileStore = defineStore('profile', () => {
       formData.append('avatar', file)
 
       const response = await updateAvatar(formData)
-      const user = response.user
+      // Handle both response structures: { user: {...} } or direct user object
+      const user = response.user || response
       const avatarUrl = user.avatar || user.profile_image_link
 
       if (profile.value) {
