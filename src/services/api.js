@@ -274,4 +274,40 @@ export async function deleteFile(id) {
   return response.data
 }
 
+// Session Management
+export async function getSessions() {
+  const response = await api.get('/sessions')
+  return response.data
+}
+
+export async function getCurrentSession() {
+  const response = await api.get('/sessions/current')
+  return response.data
+}
+
+export async function revokeSession(id) {
+  const response = await api.delete(`/sessions/${id}`)
+  return response.data
+}
+
+export async function revokeAllSessions() {
+  const response = await api.post('/sessions/revoke-all')
+  return response.data
+}
+
+export async function revokeOtherSessions() {
+  const response = await api.post('/sessions/revoke-others')
+  return response.data
+}
+
+// Change Password
+export async function changePassword(currentPassword, newPassword, newPasswordConfirmation) {
+  const response = await api.post('/auth/change-password', {
+    current_password: currentPassword,
+    password: newPassword,
+    password_confirmation: newPasswordConfirmation
+  })
+  return response.data
+}
+
 export default api
