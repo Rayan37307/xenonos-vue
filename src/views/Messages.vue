@@ -4,7 +4,7 @@
       <div class="flex items-center justify-between">
         <h1 class="text-3xl font-bold text-white font-headline">Messages</h1>
       </div>
-      <div class="flex flex-1 h-[600px] overflow-hidden bg-surface rounded-2xl border border-white/5">
+      <div class="flex flex-1 h-[600px] overflow-hidden bg-surface rounded-2xl border border-white/5 relative">
         <!-- Channels Pane -->
         <div class="w-72 bg-surface-container/50 flex flex-col border-r border-white/5">
           <div class="p-6 space-y-8 h-full overflow-y-auto no-scrollbar">
@@ -28,24 +28,32 @@
             </div>
             <div>
               <h3 class="text-[10px] uppercase tracking-[0.2em] text-slate-500 font-bold mb-4 px-2 ubuntu">Direct Messages</h3>
-              <div class="space-y-1 mt-4">
-                <div class="flex items-center gap-3 px-3 py-3 cursor-pointer rounded-xl transition-all group bg-white/[0.04]">
-                  <div class="relative">
-                    <img class="w-9 h-9 rounded-xl border border-white/5 object-cover" src="https://i.pravatar.cc/150?u=sarah" alt="Sarah">
-                    <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-surface-container bg-emerald-500"></div>
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <p class="text-sm font-bold truncate text-white tracking-tight outfit">Sarah Jenkins</p>
-                    <p class="text-[10px] text-slate-500 truncate font-semibold uppercase tracking-wider mt-0.5 ubuntu">Head of Design</p>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
 
         <!-- Chat Area -->
         <div class="flex-1 bg-surface flex flex-col relative">
+          <!-- Blur Overlay for Chat Area -->
+          <div class="absolute inset-0 bg-surface/60 backdrop-blur-md z-10"></div>
+          
+          <!-- Development Notice -->
+          <div class="absolute inset-0 z-20 flex items-center justify-center p-8">
+            <div class="text-center max-w-md">
+              <div class="w-20 h-20 bg-primary/10 border border-primary/20 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-[0_0_40px_rgba(99,102,241,0.2)]">
+                <Code class="w-10 h-10 text-primary" />
+              </div>
+              <h2 class="text-2xl font-bold text-white font-headline mb-3">Under Development</h2>
+              <p class="text-slate-400 text-sm outfit leading-relaxed mb-2">
+                We're currently building this messaging feature to bring you a better experience.
+              </p>
+              <p class="text-slate-500 text-xs font-medium uppercase tracking-widest ubuntu mt-6">
+                Coming Soon
+              </p>
+            </div>
+          </div>
+
+          <!-- Original Content (Blurred) -->
           <div class="px-6 py-5 bg-surface/80 backdrop-blur-xl border-b border-white/5">
             <h2 class="text-xl font-bold text-white tracking-tight font-headline">Neo-Finance Redesign</h2>
           </div>
@@ -87,5 +95,5 @@
 
 <script setup>
 import AppLayout from '@/components/AppLayout.vue'
-import { Hash, Smile, Paperclip, Send } from 'lucide-vue-next'
+import { Hash, Smile, Paperclip, Send, Code } from 'lucide-vue-next'
 </script>

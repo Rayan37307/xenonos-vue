@@ -67,37 +67,14 @@
         </div>
 
         <!-- 2FA -->
-        <div class="space-y-8">
+        <div class="space-y-8 ">
           <div class="bg-surface-container/50 border border-white/5 rounded-3xl p-8 shadow-xl">
             <div class="flex items-center gap-3 text-primary mb-6">
               <Shield class="w-6 h-6" />
               <h3 class="text-xl font-bold text-white font-headline">Two-Factor Auth</h3>
             </div>
-            <div class="space-y-4">
-              <div class="flex items-center justify-between p-4 rounded-2xl bg-surface border border-white/5 hover:border-primary/30 transition-all cursor-pointer shadow-inner">
-                <div class="flex items-center gap-3">
-                  <Smartphone class="w-5 h-5 text-slate-400" />
-                  <div>
-                    <p class="text-sm font-bold text-white outfit">Authenticator App</p>
-                    <p class="text-[9px] text-primary font-bold uppercase tracking-widest mt-0.5 ubuntu">Recommended</p>
-                  </div>
-                </div>
-                <div class="w-11 h-6 bg-surface-container-high rounded-full relative transition-colors border border-white/5">
-                  <div class="absolute left-1 top-1 w-4 h-4 bg-white/50 rounded-full shadow-sm transition-all"></div>
-                </div>
-              </div>
-              <div class="flex items-center justify-between p-4 rounded-2xl bg-surface border border-white/5 hover:border-slate-500/30 transition-all cursor-pointer opacity-70">
-                <div class="flex items-center gap-3">
-                  <Mail class="w-5 h-5 text-slate-400" />
-                  <div>
-                    <p class="text-sm font-bold text-white outfit">SMS Authentication</p>
-                    <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-0.5 space-font">Coming Soon</p>
-                  </div>
-                </div>
-                <div class="w-11 h-6 bg-surface-container-high rounded-full relative transition-colors border border-white/5 shadow-inner">
-                  <div class="absolute left-1 top-1 w-4 h-4 bg-white/50 rounded-full shadow-sm transition-all"></div>
-                </div>
-              </div>
+            <div class="space-y-4 uppercase font-bold">
+              this section is currently under development
             </div>
           </div>
         </div>
