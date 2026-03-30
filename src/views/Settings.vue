@@ -35,8 +35,5 @@ import { Shield, Bell, Lock, Settings as SettingsIcon, ChevronRight } from 'luci
 
 const settingCards = [
   { title: 'Account & Security', description: 'Manage your credentials and login sessions tightly regulated by Xenon secure identity protocols.', to: '/account-security', icon: Shield, action: 'CONFIGURE ACCOUNT', gradient: 'from-primary/[0.05] to-transparent', iconBg: 'group-hover:bg-primary/10 group-hover:text-primary', iconColor: 'group-hover:text-primary', lineColor: 'bg-primary/30 group-hover:bg-[#818cf8]' },
-  { title: 'Notifications', description: 'Control how you receive updates and alerts regarding platform operations.', to: '/notifications-settings', icon: Bell, action: 'PREFERENCES', gradient: 'from-amber-500/[0.05] to-transparent', iconBg: 'group-hover:bg-amber-500/10 group-hover:text-amber-400', iconColor: 'group-hover:text-amber-400', lineColor: 'bg-amber-500/30 group-hover:bg-amber-400' },
-  { title: 'Privacy & Data', description: 'Manage your user data footprint and configure internal consent preferences strictly.', to: '/privacy-data', icon: Lock, action: 'REVIEW PRIVACY', gradient: 'from-emerald-500/[0.05] to-transparent', iconBg: 'group-hover:bg-emerald-500/10 group-hover:text-emerald-400', iconColor: 'group-hover:text-emerald-400', lineColor: 'bg-emerald-500/30 group-hover:bg-emerald-400' },
-  { title: 'Preferences', description: 'System-wide display and localization settings tailored specifically for your workflow.', to: '/preferences', icon: SettingsIcon, action: 'CUSTOMIZE UI', gradient: 'from-pink-500/[0.05] to-transparent', iconBg: 'group-hover:bg-pink-500/10 group-hover:text-pink-400', iconColor: 'group-hover:text-pink-400', lineColor: 'bg-pink-500/30 group-hover:bg-pink-400' }
 ]
 </script>

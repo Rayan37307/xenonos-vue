@@ -32,7 +32,7 @@
             <span class="text-2xl font-bold text-white space-font tracking-tight">
               {{ service.price }}<span class="text-[10px] text-slate-500 font-normal ml-1 tracking-widest uppercase">{{ service.priceUnit }}</span>
             </span>
-            <button :class="['px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:shadow-[0_0_30px_rgba(99,102,241,0.3)] active:scale-95 flex items-center gap-2 ubuntu', service.buttonClass]">
+            <button @click="openOrderModal(service)" :class="['px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:shadow-[0_0_30px_rgba(99,102,241,0.3)] active:scale-95 flex items-center gap-2 ubuntu', service.buttonClass]">
               Order Now <ArrowRight class="w-3.5 h-3.5" />
             </button>
           </div>
@@ -48,7 +48,7 @@
             <p class="text-sm text-slate-400 leading-relaxed mb-6 mt-3 outfit">Have a unique project in mind? Our team can architect a bespoke solution tailored to your exact needs.</p>
           </div>
           <div class="mt-auto pt-6 border-t border-white/5">
-            <button class="w-full py-3.5 bg-surface-container-high border border-white/5 rounded-xl text-[10px] font-bold uppercase tracking-widest text-white hover:bg-[#2d3a4d] transition-all shadow-xl ubuntu">
+            <button @click="openOrderModal(null)" class="w-full py-3.5 bg-surface-container-high border border-white/5 rounded-xl text-[10px] font-bold uppercase tracking-widest text-white hover:bg-[#2d3a4d] transition-all shadow-xl ubuntu">
               Open Inquiry
             </button>
           </div>
@@ -70,12 +70,142 @@
         </div>
       </div>
     </div>
+
+    <!-- Service Order Modal -->
+    <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200" @click.self="closeModal">
+      <div class="bg-surface rounded-2xl border border-white/10 w-full max-w-lg shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between p-6 border-b border-white/5">
+          <div>
+            <h2 class="text-xl font-bold text-white font-headline">{{ selectedService ? selectedService.title : 'Custom Request' }}</h2>
+            <p class="text-xs text-slate-400 mt-1 outfit">Submit your service order proposal</p>
+          </div>
+          <button @click="closeModal" class="text-slate-400 hover:text-white transition-colors p-2 hover:bg-white/5 rounded-lg">
+            <X class="w-5 h-5" />
+          </button>
+        </div>
+
+        <!-- Modal Body -->
+        <form @submit.prevent="submitOrder" class="p-6 space-y-5">
+          <!-- Service Type (hidden if selected service) -->
+          <div v-if="!selectedService">
+            <label class="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 ubuntu">Service Type</label>
+            <select v-model="form.service_type" class="w-full bg-surface-container-high border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all outfit">
+              <option value="">Select a service type</option>
+              <option value="Web Development">Web Development</option>
+              <option value="Mobile Development">Mobile Development</option>
+              <option value="UI/UX Design">UI/UX Design</option>
+              <option value="Cloud Infrastructure">Cloud Infrastructure</option>
+              <option value="Security Audit">Security Audit</option>
+              <option value="Consulting">Consulting</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <!-- Title -->
+          <div>
+            <label class="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 ubuntu">Project Title</label>
+            <input 
+              v-model="form.title" 
+              type="text" 
+              required
+              :placeholder="selectedService ? selectedService.title + ' Project' : 'Enter project title'"
+              class="w-full bg-surface-container-high border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all outfit"
+            />
+          </div>
+
+          <!-- Description -->
+          <div>
+            <label class="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 ubuntu">Description</label>
+            <textarea 
+              v-model="form.description" 
+              required
+              rows="4"
+              placeholder="Describe your project requirements, goals, and any specific features you need..."
+              class="w-full bg-surface-container-high border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all outfit resize-none"
+            ></textarea>
+          </div>
+
+          <!-- Budget Range -->
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 ubuntu">Min Budget ($)</label>
+              <input 
+                v-model.number="form.budget_min" 
+                type="number" 
+                min="0"
+                placeholder="5000"
+                class="w-full bg-surface-container-high border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all outfit"
+              />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 ubuntu">Max Budget ($)</label>
+              <input 
+                v-model.number="form.budget_max" 
+                type="number" 
+                min="0"
+                placeholder="10000"
+                class="w-full bg-surface-container-high border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all outfit"
+              />
+            </div>
+          </div>
+
+          <!-- Deadline -->
+          <div>
+            <label class="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 ubuntu">Expected Deadline</label>
+            <input 
+              v-model="form.deadline" 
+              type="date" 
+              :min="new Date().toISOString().split('T')[0]"
+              class="w-full bg-surface-container-high border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all outfit [color-scheme:dark]"
+            />
+          </div>
+
+          <!-- Submit Button -->
+          <button 
+            type="submit" 
+            :disabled="submitting"
+            class="w-full py-4 bg-primary hover:bg-[#5355e1] disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-bold uppercase tracking-widest rounded-xl transition-all shadow-xl hover:shadow-[0_0_30px_rgba(99,102,241,0.3)] active:scale-[0.98] text-[10px] ubuntu flex items-center justify-center gap-2"
+          >
+            <span v-if="submitting" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+            <span>{{ submitting ? 'Submitting...' : 'Submit Proposal' }}</span>
+          </button>
+
+          <p class="text-xs text-slate-500 text-center outfit">
+            An admin will review your proposal and get back to you within 24-48 hours.
+          </p>
+        </form>
+      </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div v-if="showSuccessModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200" @click.self="closeSuccessModal">
+      <div class="bg-surface rounded-2xl border border-white/10 w-full max-w-md shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden p-8 text-center">
+        <div class="w-16 h-16 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+          <Check class="w-8 h-8 text-emerald-400" />
+        </div>
+        <h2 class="text-2xl font-bold text-white font-headline mb-3">Proposal Submitted!</h2>
+        <p class="text-sm text-slate-400 outfit leading-relaxed mb-6">
+          Your service order has been successfully submitted. Our team will review your proposal and contact you soon.
+        </p>
+        <button @click="closeSuccessModal" class="px-8 py-3 bg-primary hover:bg-[#5355e1] text-white font-bold uppercase tracking-widest rounded-xl transition-all shadow-xl text-[10px] ubuntu">
+          Got It
+        </button>
+      </div>
+    </div>
   </AppLayout>
 </template>
 
 <script setup>
 import AppLayout from '@/components/AppLayout.vue'
-import { Brush, Code, Cloud, Shield, Sparkles, ArrowRight } from 'lucide-vue-next'
+import { ref, reactive } from 'vue'
+import { Brush, Code, Cloud, Shield, Sparkles, ArrowRight, X, Check } from 'lucide-vue-next'
+import { useAuthStore } from '@/stores/auth'
+import { createServiceOrder } from '@/services/api'
+import { useRouter } from 'vue-router'
+
+const authStore = useAuthStore()
+const router = useRouter()
 
 const services = [
   { title: 'Custom UI/UX Design', description: 'Transformation of your digital identity through high-fidelity prototypes and conversion-optimized interfaces.', tags: ['Design Systems', 'User Testing'], price: '$4,999', priceUnit: '/project', icon: Brush, iconBg: 'bg-primary/10', iconBorder: 'border-primary/20', iconText: 'text-primary', titleHover: 'group-hover:text-primary', gradient: 'from-primary/[0.02] to-transparent', borderHover: 'hover:border-primary/30', buttonClass: 'bg-primary text-white hover:bg-[#5355e1]' },
@@ -83,4 +213,76 @@ const services = [
   { title: 'Cloud Infrastructure', description: 'AWS/Azure architecture setup with automated CI/CD pipelines and 99.9% uptime guarantee.', tags: ['DevOps', 'Security'], price: '$1,250', priceUnit: '/mo', icon: Cloud, iconBg: 'bg-primary/10', iconBorder: 'border-primary/20', iconText: 'text-primary', titleHover: 'group-hover:text-primary', gradient: 'from-primary/[0.02] to-transparent', borderHover: 'hover:border-primary/30', buttonClass: 'w-10 h-10 rounded-xl bg-surface-container-high border border-white/5 flex items-center justify-center text-primary hover:bg-primary hover:text-white hover:border-transparent transition-all shadow-xl' },
   { title: 'Security Audit', description: 'Comprehensive penetration testing and vulnerability assessment for enterprise applications.', tags: ['Pentest', 'Compliance'], price: '$2,800', priceUnit: '/audit', icon: Shield, iconBg: 'bg-rose-500/10', iconBorder: 'border-rose-500/20', iconText: 'text-rose-400', titleHover: 'group-hover:text-rose-400', gradient: 'from-rose-500/[0.02] to-transparent', borderHover: 'hover:border-rose-500/30', buttonClass: 'w-10 h-10 rounded-xl bg-surface-container-high border border-white/5 flex items-center justify-center text-rose-400 hover:bg-rose-500 hover:text-white hover:border-transparent transition-all shadow-xl' }
 ]
+
+const showModal = ref(false)
+const showSuccessModal = ref(false)
+const submitting = ref(false)
+const selectedService = ref(null)
+
+const form = reactive({
+  service_type: '',
+  title: '',
+  description: '',
+  budget_min: null,
+  budget_max: null,
+  deadline: ''
+})
+
+function openOrderModal(service) {
+  if (!authStore.isAuthenticated) {
+    router.push('/login')
+    return
+  }
+  
+  selectedService.value = service
+  if (service) {
+    form.service_type = service.title
+    form.title = ''
+  }
+  form.description = ''
+  form.budget_min = null
+  form.budget_max = null
+  form.deadline = ''
+  showModal.value = true
+}
+
+function closeModal() {
+  showModal.value = false
+  selectedService.value = null
+}
+
+function closeSuccessModal() {
+  showSuccessModal.value = false
+  closeModal()
+}
+
+async function submitOrder() {
+  if (!authStore.isAuthenticated) {
+    router.push('/login')
+    return
+  }
+
+  submitting.value = true
+  
+  try {
+    const payload = {
+      service_type: selectedService.value ? selectedService.value.title : form.service_type,
+      title: form.title,
+      description: form.description,
+      budget_min: form.budget_min,
+      budget_max: form.budget_max,
+      deadline: form.deadline || null
+    }
+
+    await createServiceOrder(payload)
+    
+    showModal.value = false
+    showSuccessModal.value = true
+  } catch (error) {
+    console.error('Failed to submit service order:', error)
+    alert(error.response?.data?.message || 'Failed to submit service order. Please try again.')
+  } finally {
+    submitting.value = false
+  }
+}
 </script>

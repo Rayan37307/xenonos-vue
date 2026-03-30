@@ -224,6 +224,11 @@ export async function getService(id) {
   return response.data
 }
 
+export async function createServiceOrder(data) {
+  const response = await api.post('/service-orders', data)
+  return response.data
+}
+
 // Files
 export async function listFiles(params = {}) {
   try {
