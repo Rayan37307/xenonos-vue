@@ -154,15 +154,20 @@ export async function getInvoice(id) {
 export async function getDashboardStats() {
   try {
     const response = await api.get('/analytics/dashboard')
+    // API returns { analytics: { overview: {...}, ... } }
     return response.data
   } catch (error) {
     // Return default stats if endpoint doesn't exist
     return {
-      total_projects: 0,
-      completion_rate: 0,
-      ongoing_tasks: 0,
-      team_bandwidth: 0,
-      tasks_due_today: 0
+      analytics: {
+        overview: {
+          total_projects: 0,
+          completion_rate: 0,
+          ongoing_tasks: 0,
+          team_bandwidth: 0,
+          tasks_due_today: 0
+        }
+      }
     }
   }
 }
@@ -170,6 +175,7 @@ export async function getDashboardStats() {
 export async function getRecentProjects() {
   try {
     const response = await api.get('/analytics/recent-projects')
+    // API returns { projects: [...] }
     return response.data
   } catch (error) {
     // Return empty array if endpoint doesn't exist
@@ -180,6 +186,7 @@ export async function getRecentProjects() {
 export async function getActiveTasks() {
   try {
     const response = await api.get('/analytics/active-tasks')
+    // API returns { tasks: [...] }
     return response.data
   } catch (error) {
     // Return empty array if endpoint doesn't exist
@@ -225,6 +232,41 @@ export async function listFiles(params = {}) {
   } catch (error) {
     return { files: [] }
   }
+}
+
+export async function getFile(id) {
+  const response = await api.get(`/files/${id}`)
+  return response.data
+}
+
+export async function uploadFile(formData, params = {}) {
+  const response = await api.post('/files', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+    params,
+  })
+  return response.data
+}
+
+export async function uploadExternalLink(data) {
+  const response = await api.post('/files', data)
+  return response.data
+}
+
+export async function downloadFile(id) {
+  const response = await api.get(`/files/${id}/download`)
+  return response.data
+}
+
+export async function updateFile(id, data) {
+  const response = await api.put(`/files/${id}`, data)
+  return response.data
+}
+
+export async function deleteFile(id) {
+  const response = await api.delete(`/files/${id}`)
+  return response.data
 }
 
 export default api

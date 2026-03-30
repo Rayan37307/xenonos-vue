@@ -26,12 +26,12 @@ export const useDashboardStore = defineStore('dashboard', () => {
     return {
       id: apiProject.id,
       name: apiProject.name || apiProject.title,
-      description: apiProject.description,
-      status: apiProject.status,
-      progress: apiProject.progress || 0,
+      description: apiProject.description || `Project with ${apiProject.task_count || 0} tasks`,
+      status: apiProject.status || 'active',
+      progress: apiProject.progress || apiProject.progress_percentage || 0,
       deadline: apiProject.deadline,
       team: apiProject.workers?.map(w => w.avatar || `https://i.pravatar.cc/150?u=${w.id}`) || [],
-      icon: getProjectIcon(apiProject.type || 'default')
+      icon: getProjectIcon(apiProject.type || apiProject.service_type || 'default')
     }
   }
 
@@ -130,6 +130,8 @@ export const useDashboardStore = defineStore('dashboard', () => {
     loading.value = true
     error.value = null
     try {
+      console.log('[Dashboard Store] Fetching dashboard data...')
+      
       // Fetch all data in parallel
       const [
         statsResponse,
@@ -149,54 +151,86 @@ export const useDashboardStore = defineStore('dashboard', () => {
         getNotifications(false).catch(() => ({ data: [] }))
       ])
 
-      // Process stats
+      console.log('[Dashboard Store] Raw responses:', {
+        stats: statsResponse,
+        projects: projectsResponse,
+        tasks: tasksResponse,
+        invoices: invoicesResponse,
+        services: servicesResponse,
+        files: filesResponse,
+        notifications: notificationsResponse
+      })
+
+      // Process stats - API returns { analytics: { overview: {...} } }
       if (statsResponse.status === 'fulfilled') {
-        const data = statsResponse.value.data || statsResponse.value
-        stats.totalProjects = data.total_projects || 0
-        stats.completionRate = data.completion_rate || 0
-        stats.ongoingTasks = data.ongoing_tasks || 0
-        stats.teamBandwidth = data.team_bandwidth || 0
-        stats.tasksDueToday = data.tasks_due_today || 0
+        const responseData = statsResponse.value
+        // Handle different response structures
+        const analyticsData = responseData.analytics || responseData.data?.analytics || responseData.data || responseData
+        const overview = analyticsData.overview || analyticsData
+        
+        console.log('[Dashboard Store] Stats overview:', overview)
+        
+        stats.totalProjects = overview.total_projects || 0
+        stats.completionRate = overview.completion_rate || 0
+        stats.ongoingTasks = overview.ongoing_tasks || overview.pending_tasks || 0
+        stats.teamBandwidth = overview.team_bandwidth || 0
+        stats.tasksDueToday = overview.tasks_due_today || 0
       }
 
-      // Process recent projects
+      // Process recent projects - API returns { projects: [...] }
       if (projectsResponse.status === 'fulfilled') {
-        const data = projectsResponse.value.projects || projectsResponse.value.data || []
-        recentProjects.value = data.slice(0, 2).map(mapProject)
+        const responseData = projectsResponse.value
+        const projectsData = responseData.projects || responseData.data?.projects || responseData.data || []
+        console.log('[Dashboard Store] Projects data:', projectsData)
+        recentProjects.value = projectsData.slice(0, 2).map(mapProject)
       }
 
-      // Process active tasks
+      // Process active tasks - API returns { tasks: [...] }
       if (tasksResponse.status === 'fulfilled') {
-        const data = tasksResponse.value.tasks || tasksResponse.value.data || []
-        activeTasks.value = data.slice(0, 5)
+        const responseData = tasksResponse.value
+        const tasksData = responseData.tasks || responseData.data?.tasks || responseData.data || []
+        activeTasks.value = tasksData.slice(0, 5)
       }
 
       // Process invoices
       if (invoicesResponse.status === 'fulfilled') {
-        const data = invoicesResponse.value.invoices || invoicesResponse.value.data || []
-        recentInvoices.value = data.slice(0, 1).map(mapInvoice)
+        const responseData = invoicesResponse.value
+        const invoicesData = responseData.invoices || responseData.data?.invoices || responseData.data || []
+        recentInvoices.value = invoicesData.slice(0, 1).map(mapInvoice)
       }
 
       // Process services
       if (servicesResponse.status === 'fulfilled') {
-        const data = servicesResponse.value.services || servicesResponse.value.data || []
-        recentServices.value = data.slice(0, 3).map(mapService)
+        const responseData = servicesResponse.value
+        const servicesData = responseData.services || responseData.data?.services || responseData.data || []
+        console.log('[Dashboard Store] Services data:', servicesData)
+        recentServices.value = servicesData.slice(0, 3).map(mapService)
       }
 
       // Process files
       if (filesResponse.status === 'fulfilled') {
-        const data = filesResponse.value.files || filesResponse.value.data || []
-        recentFiles.value = data.slice(0, 2).map(mapFile)
+        const responseData = filesResponse.value
+        const filesData = responseData.files || responseData.data?.files || responseData.data || []
+        recentFiles.value = filesData.slice(0, 2).map(mapFile)
       }
 
-      // Process notifications
+      // Process notifications - API returns { notifications: [...] }
       if (notificationsResponse.status === 'fulfilled') {
-        const data = notificationsResponse.value.notifications || notificationsResponse.value.data || []
-        recentNotifications.value = data.slice(0, 3).map(mapNotification)
+        const responseData = notificationsResponse.value
+        const notificationsData = responseData.notifications || responseData.data?.notifications || responseData.data || []
+        recentNotifications.value = notificationsData.slice(0, 3).map(mapNotification)
       }
 
       // Generate activity feed from various sources
       generateActivityFeed()
+
+      console.log('[Dashboard Store] Final state:', {
+        stats,
+        recentProjects: recentProjects.value,
+        recentServices: recentServices.value,
+        recentFiles: recentFiles.value,
+        recentNotifications: recentNotifications.value
+      })
 
       return {
         stats,
@@ -206,7 +240,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     } catch (err) {
       error.value = err.message || 'Failed to load dashboard data'
       // Don't throw - allow UI to show empty state
-      console.error('Dashboard fetch error:', err)
+      console.error('[Dashboard Store] Dashboard fetch error:', err)
     } finally {
       loading.value = false
     }
