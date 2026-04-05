@@ -310,4 +310,40 @@ export async function changePassword(currentPassword, newPassword, newPasswordCo
   return response.data
 }
 
+// Chat (channel messages stored with SHA-256 content_hash on the server)
+export async function listChatChannels() {
+  const response = await api.get('/chat/channels')
+  return response.data
+}
+
+export async function getChannelMessages(channelId, params = {}) {
+  const response = await api.get(`/chat/channels/${channelId}/messages`, { params })
+  return response.data
+}
+
+export async function sendChannelMessage(channelId, content) {
+  const response = await api.post(`/chat/channels/${channelId}/messages`, { content })
+  return response.data
+}
+
+export async function listChatConversations() {
+  const response = await api.get('/chat/conversations')
+  return response.data
+}
+
+export async function createChatConversation(userId) {
+  const response = await api.post('/chat/conversations', { user_id: userId })
+  return response.data
+}
+
+export async function getConversationMessages(conversationId, params = {}) {
+  const response = await api.get(`/chat/conversations/${conversationId}/messages`, { params })
+  return response.data
+}
+
+export async function sendConversationMessage(conversationId, content) {
+  const response = await api.post(`/chat/conversations/${conversationId}/messages`, { content })
+  return response.data
+}
+
 export default api
