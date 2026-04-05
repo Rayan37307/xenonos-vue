@@ -21,6 +21,8 @@ const Settings = () => import('@/views/Settings.vue')
 const AccountSecurity = () => import('@/views/AccountSecurity.vue')
 const PrivacyData = () => import('@/views/PrivacyData.vue')
 const PreferencesInfo = () => import('@/views/PreferencesInfo.vue')
+const Clients = () => import('@/views/Clients.vue')
+const ClientDetails = () => import('@/views/ClientDetails.vue')
 
 const routes = [
   {
@@ -137,6 +139,19 @@ const routes = [
     name: 'PreferencesInfo',
     component: PreferencesInfo,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/clients',
+    name: 'Clients',
+    component: Clients,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/clients/:id',
+    name: 'ClientDetails',
+    component: ClientDetails,
+    meta: { requiresAuth: true },
+    props: true
   }
 ]
 

@@ -84,6 +84,26 @@
       </RouterLink>
 
       <RouterLink
+        to="/clients"
+        custom
+        v-slot="{ href, navigate, isActive }"
+      >
+        <a
+          :href="href"
+          @click="navigate"
+          :class="[
+            'w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group',
+            isActive
+              ? 'bg-primary/10 text-primary'
+              : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+          ]"
+        >
+          <Users :class="['w-5 h-5', isActive ? 'text-primary' : 'text-slate-400 group-hover:text-slate-200 transition-colors']" />
+          <span class="text-sm font-medium outfit">Clients</span>
+        </a>
+      </RouterLink>
+
+      <RouterLink
         to="/files"
         custom
         v-slot="{ href, navigate, isActive }"
@@ -226,6 +246,7 @@ import {
   Layers,
   CreditCard,
   User,
+  Users,
   Bell,
   Settings,
   LogOut,

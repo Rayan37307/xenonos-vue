@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { listProjects, getProject, createProject, updateProject, deleteProject } from '@/services/api'
+import { listProjects, getProject, getMyProjects, createProject, updateProject, deleteProject } from '@/services/api'
 
 export const useProjectsStore = defineStore('projects', () => {
   // State
@@ -8,6 +8,12 @@ export const useProjectsStore = defineStore('projects', () => {
   const currentProject = ref(null)
   const loading = ref(false)
   const error = ref(null)
+  const pagination = ref({
+    current_page: 1,
+    last_page: 1,
+    per_page: 15,
+    total: 0
+  })
   const stats = ref({
     total: 0,
     active: 0,
@@ -64,8 +70,14 @@ export const useProjectsStore = defineStore('projects', () => {
     error.value = null
     try {
       const response = await listProjects(filters)
-      const apiProjects = response.projects || response.data || []
+      const apiProjects = response.projects?.data || response.projects || []
       projects.value = apiProjects.map(mapProject)
+      pagination.value = {
+        current_page: response.meta?.current_page || 1,
+        last_page: response.meta?.last_page || 1,
+        per_page: response.meta?.per_page || 15,
+        total: response.meta?.total || 0
+      }
       
       // Update stats
       stats.value = {
@@ -78,6 +90,28 @@ export const useProjectsStore = defineStore('projects', () => {
       return projects.value
     } catch (err) {
       error.value = err.response?.data?.message || 'Failed to load projects'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function fetchMyProjects(filters = {}) {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await getMyProjects(filters)
+      const apiProjects = response.projects?.data || response.projects || []
+      projects.value = apiProjects.map(mapProject)
+      pagination.value = {
+        current_page: response.meta?.current_page || 1,
+        last_page: response.meta?.last_page || 1,
+        per_page: response.meta?.per_page || 15,
+        total: response.meta?.total || 0
+      }
+      return projects.value
+    } catch (err) {
+      error.value = err.response?.data?.message || 'Failed to load my projects'
       throw err
     } finally {
       loading.value = false
@@ -160,11 +194,13 @@ export const useProjectsStore = defineStore('projects', () => {
     currentProject,
     loading,
     error,
+    pagination,
     stats,
     activeProjects,
     completedProjects,
     pendingProjects,
     fetchProjects,
+    fetchMyProjects,
     fetchProject,
     createNewProject,
     updateProjectData,

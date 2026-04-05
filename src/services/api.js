@@ -73,6 +73,11 @@ export async function getActivitySummary() {
   return response.data
 }
 
+export async function getUserActivity(params = {}) {
+  const response = await api.get('/user/activity', { params })
+  return response.data
+}
+
 // Notifications
 export async function getNotifications(includeRead = false) {
   const response = await api.get('/notifications', { params: { include_read: includeRead } })
@@ -117,6 +122,11 @@ export async function listProjects(params = {}) {
 
 export async function getProject(id) {
   const response = await api.get(`/projects/${id}`)
+  return response.data
+}
+
+export async function getMyProjects(params = {}) {
+  const response = await api.get('/projects/my', { params })
   return response.data
 }
 
@@ -307,6 +317,41 @@ export async function changePassword(currentPassword, newPassword, newPasswordCo
     password: newPassword,
     password_confirmation: newPasswordConfirmation
   })
+  return response.data
+}
+
+// Clients (admin only)
+export async function listClients(params = {}) {
+  try {
+    const response = await api.get('/admin/clients', { params })
+    return response.data
+  } catch (error) {
+    return { clients: [], meta: { total: 0, current_page: 1, last_page: 1, per_page: 15 } }
+  }
+}
+
+export async function getClient(id) {
+  const response = await api.get(`/admin/clients/${id}`)
+  return response.data
+}
+
+export async function createClient(data) {
+  const response = await api.post('/admin/clients', data)
+  return response.data
+}
+
+export async function updateClient(id, data) {
+  const response = await api.put(`/admin/clients/${id}`, data)
+  return response.data
+}
+
+export async function deleteClient(id) {
+  const response = await api.delete(`/admin/clients/${id}`)
+  return response.data
+}
+
+export async function getClientStats(id) {
+  const response = await api.get(`/admin/clients/${id}/stats`)
   return response.data
 }
 
